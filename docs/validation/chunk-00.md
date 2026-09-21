@@ -2,7 +2,9 @@
 
 Branch `chunk-00-project-bootstrap`. Validator: `requirements-validator` (definition in `.claude/agents/requirements-validator.md`).
 
-**Status: NOT SIGNED OFF.** The validator's verdict on the first run was DO NOT SIGN OFF, because three acceptance criteria could not be independently verified from the repository (they need a running app and a browser). The author's evidence is recorded below. The chunk is signed off only when the project owner accepts that evidence or a re-run of the validator verifies it. Update this file when that happens.
+**Status: SIGNED OFF BY THE PROJECT OWNER (2026-09-21), on the basis of the recorded evidence. Validator verdict on run 1 remains DO NOT SIGN OFF.**
+
+The validator's verdict on the first run was DO NOT SIGN OFF, because three acceptance criteria could not be independently verified from the repository (they need a running app and a browser): *app starts against Postgres*, *admin screens load*, and *README followed literally*. The author's evidence for them is recorded below. The project owner reviewed it and signed off Chunk 0 on that evidence. This is an **owner waiver of independent verification for those three items, not a validator sign-off**: the validator has not re-run and has not verified them. Chunk 12's traceability matrix must record these three items as "owner-accepted", not as "validator-verified", unless the validator later verifies them. Two items remain open (findings 3 and 4 below).
 
 > Note on how it was run: the subagent type was not yet registered in the session that created it (agent definitions load at session start), so the first run used a general-purpose agent instructed to follow `requirements-validator.md` verbatim (read-only, mandated report format). Later chunks should run the registered subagent.
 
