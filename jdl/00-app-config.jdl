@@ -1,0 +1,81 @@
+// ============================================================================
+// Payment Gateway Platform — Base Application Configuration
+// ============================================================================
+// This file defines ONLY the application shell (Chunk 0 / bootstrap). It
+// deliberately carries no entities of its own — entities live in the
+// numbered files alongside it (10-tenant.jdl, 20-catalog-fx.jdl, etc.) and
+// are merged in at generation time by passing every file to the same
+// `jhipster jdl` invocation. See ../docs/TASK_BREAKDOWN.md, Chunk 0, for the
+// exact command and the review/test/commit steps around it.
+//
+// Decisions baked in here were made explicitly with the project owner
+// (2026-09-21): monolith first (not a microservices skeleton yet), Angular
+// admin client, JWT auth for internal/staff accounts, Maven build. See
+// ../docs/adr-jhipster.md for the full reasoning — this config is the
+// direct implementation of that ADR's "Decision" and "Next Steps" sections.
+//
+// Rename baseName / packageName here before running anything if the
+// assumed names below aren't what you want — it's far cheaper to change
+// now than after entities exist.
+// ============================================================================
+
+application {
+  config {
+    baseName paymentgateway
+    packageName io.paymentgateway.core
+    applicationType monolith
+    authenticationType jwt
+    buildTool maven
+    cacheProvider caffeine
+    clientFramework angular
+    clientTestFrameworks [cypress]
+    databaseType sql
+    devDatabaseType postgresql
+    prodDatabaseType postgresql
+    dtoSuffix DTO
+    enableHibernateCache true
+    enableSwaggerCodegen true
+    enableTranslation false
+    jhiPrefix jhi
+    languages [en]
+    messageBroker false
+    nativeLanguage en
+    reactive false
+    searchEngine false
+    serverPort 8080
+    serviceDiscoveryType false
+    skipUserManagement false
+    testFrameworks [cucumber]
+    websocket false
+    withAdminUi true
+  }
+  entities *
+}
+
+// ----------------------------------------------------------------------------
+// Notes for whoever runs this (human or Claude Code):
+//
+// 1. devDatabaseType is set to postgresql, not the JHipster default h2,
+//    because the row-level-security tenant-isolation layer (Chunk 5 in the
+//    task breakdown) can only be developed and tested against real
+//    Postgres — H2 doesn't support RLS. Requires a local/dev Postgres
+//    instance from day one; docker-compose for it is part of Chunk 0's
+//    deliverables.
+//
+// 2. messageBroker is off here. Kafka is introduced deliberately later, at
+//    the point the ADR's Chunk 10 migration roadmap calls for it (Phase 2:
+//    extracting Transaction & Routing once throughput exceeds ~1,000
+//    writes/sec) — not before there's a service boundary that needs it.
+//
+// 3. skipUserManagement is false: JHipster's generated User/Authority
+//    entities back the INTERNAL staff/admin login only. The merchant-facing
+//    API-key authentication (sk_live_..., sk_test_...) described in the
+//    spec's Chunk 10 is unrelated and is built by hand in the Transaction
+//    module — do not try to unify these two auth systems.
+//
+// 4. serviceDiscoveryType is false because this is a monolith. When Chunk
+//    10's roadmap phase 2/3 extraction actually happens, this file gets a
+//    follow-up revision (applicationType microservice, serviceDiscoveryType
+//    consul, messageBroker kafka) — that is future work, not part of this
+//    generation.
+// ----------------------------------------------------------------------------

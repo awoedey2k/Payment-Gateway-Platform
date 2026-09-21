@@ -1,0 +1,77 @@
+// ============================================================================
+// Module: Tenant  (maps to Chunk 1 of TASK_BREAKDOWN.md)
+// Spec reference: Technical Specification, Chunk 2 (Tenant Lifecycle,
+// Onboarding, KYC/KYB, API Key Rotation)
+// ============================================================================
+
+entity CorporateTenant {
+  legalBusinessName String required
+  businessRegistrationNumber String required unique
+  taxIdentificationNumber String required
+  operatingJurisdiction CountryCode required
+  status TenantStatus required
+  kycStatus KycStatus required
+  riskScore Integer
+  createdAt Instant required
+  activatedAt Instant
+}
+
+entity TenantDirector {
+  fullName String required
+  dateOfBirth LocalDate required
+  nationality CountryCode required
+  identificationType IdentificationType required
+  identificationNumber String required
+}
+
+entity ApiKey {
+  keyPrefix String required
+  keyHash String required
+  environment ApiEnvironment required
+  isActive Boolean required
+  issuedAt Instant required
+  revokedAt Instant
+  graceExpiresAt Instant
+}
+
+entity TenantDomain {
+  customDomain String required unique
+  supportedLocales String
+  isVerified Boolean required
+}
+
+enum TenantStatus {
+  PENDING_REVIEW, ACTIVE, SUSPENDED, REJECTED, CLOSED
+}
+
+enum KycStatus {
+  NOT_STARTED, PENDING, APPROVED, REJECTED, MANUAL_REVIEW
+}
+
+enum IdentificationType {
+  NATIONAL_ID, PASSPORT, DRIVERS_LICENSE
+}
+
+enum ApiEnvironment {
+  TEST, LIVE
+}
+
+enum CountryCode {
+  NG, KE, GH, ZA, DE, US, GB
+}
+
+relationship OneToMany {
+  CorporateTenant to TenantDirector{tenant required}
+  CorporateTenant to ApiKey{tenant required}
+  CorporateTenant to TenantDomain{tenant required}
+}
+
+// Notes:
+// - keyHash stores a hash of the API key, never the raw secret — matches
+//   the dual-active-window rotation pattern in Chunk 2 (Key A / Key B,
+//   grace period, explicit revoke).
+// - CountryCode is intentionally a small closed enum for the launch
+//   countries the spec names (NG, KE, GH, ZA, DE) plus US/GB as likely
+//   near-term additions; extend as new corridors launch rather than
+//   switching to a free-text field, so routing/fee logic stays exhaustive
+//   over a known set.

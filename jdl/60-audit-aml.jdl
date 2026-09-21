@@ -1,0 +1,101 @@
+// ============================================================================
+// Module: Audit & AML  (maps to Chunks 8 & 9 of TASK_BREAKDOWN.md)
+// Spec reference: Technical Specification, Chunk 8 (Dispute & Chargeback
+// Lifecycle) and Chunk 9 (Security, Compliance, AML) plus Chunk 10 §3
+// (Webhook Delivery Engine)
+// ============================================================================
+
+entity Dispute {
+  caseReference String required unique
+  amount BigDecimal required
+  currencyCode String required
+  reasonCode String required
+  reasonDescription String
+  status DisputeStatus required
+  dueDate Instant required
+  evidenceSubmittedAt Instant
+  resolvedAt Instant
+}
+
+entity DisputeEvidence {
+  evidenceType DisputeEvidenceType required
+  fileName String required
+  fileUrl String required
+  fileSizeBytes Long required
+  mimeType String required
+  sha256Checksum String required
+  uploadedAt Instant required
+}
+
+entity AmlCheck {
+  riskScore Integer required
+  decision AmlDecision required
+  ruleTriggered String
+  checkedAt Instant required
+}
+
+entity AuditLogEntry {
+  actorType ActorType required
+  actorId String required
+  action String required
+  entityType String required
+  entityId String required
+  previousHash String
+  entryHash String required
+  recordedAt Instant required
+}
+
+entity WebhookSubscription {
+  targetUrl String required
+  secretHash String required
+  isActive Boolean required
+}
+
+entity WebhookDeliveryAttempt {
+  eventType String required
+  status WebhookDeliveryStatus required
+  httpStatusCode Integer
+  attemptNumber Integer required
+  attemptedAt Instant required
+}
+
+enum DisputeStatus {
+  OPEN, EVIDENCE_SUBMITTED, UNDER_REVIEW, WON, LOST, CLOSED
+}
+
+enum DisputeEvidenceType {
+  PROOF_OF_DELIVERY, CUSTOMER_COMMUNICATION, REFUND_POLICY, OTHER
+}
+
+enum AmlDecision {
+  ALLOW, CHALLENGE, REJECT, TIER_REVIEW
+}
+
+enum ActorType {
+  SYSTEM, STAFF_USER, TENANT_USER
+}
+
+enum WebhookDeliveryStatus {
+  PENDING, DELIVERED, FAILED, RETRYING
+}
+
+relationship ManyToOne {
+  Dispute{tenant required} to CorporateTenant
+  Dispute{transaction required} to Transaction
+  DisputeEvidence{dispute required} to Dispute
+  AmlCheck{tenant} to CorporateTenant
+  AmlCheck{transaction} to Transaction
+  WebhookSubscription{tenant required} to CorporateTenant
+  WebhookDeliveryAttempt{subscription required} to WebhookSubscription
+}
+
+// Notes:
+// - AuditLogEntry references entityType/entityId as plain strings rather
+//   than JPA relationships, deliberately: it's a generic, polymorphic log
+//   of changes across every other entity in the system, and a real foreign
+//   key per referenced type would mean a different AuditLogEntry subtype
+//   for every table. previousHash/entryHash implement the hash-chaining
+//   the spec's Chunk 9 calls for — verify the chain, don't just trust
+//   entryHash in isolation.
+// - AmlCheck.tenant/transaction are optional: some checks (e.g. sanctions
+//   screening at onboarding) run before a transaction exists.

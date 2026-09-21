@@ -1,0 +1,60 @@
+// ============================================================================
+// Module: Transaction  (maps to Chunk 4 of TASK_BREAKDOWN.md)
+// Spec reference: Technical Specification, Chunk 5 (End-to-End Transaction
+// Processing Engine, State Machine, Idempotency) and Chunk 10 §2 (REST API)
+// ============================================================================
+
+entity Transaction {
+  reference String required unique
+  tenantReference String
+  status TransactionStatus required
+  amount BigDecimal required
+  feeAmount BigDecimal required
+  netAmount BigDecimal required
+  currencyCode String required
+  countryCode String required
+  paymentMethodCode String required
+  idempotencyKey String required unique
+  customerEmail String
+  customerPhone String
+  createdAt Instant required
+  completedAt Instant
+}
+
+entity Refund {
+  reference String required unique
+  amount BigDecimal required
+  reason RefundReason required
+  status RefundStatus required
+  createdAt Instant required
+}
+
+enum TransactionStatus {
+  PENDING, AUTHORIZED, SUCCESSFUL, FAILED, REVERSED
+}
+
+enum RefundReason {
+  CUSTOMER_REQUEST_RETURN, FRAUD, DUPLICATE, OTHER
+}
+
+enum RefundStatus {
+  PENDING, REFUNDED, FAILED
+}
+
+relationship ManyToOne {
+  Transaction{tenant required} to CorporateTenant
+}
+
+relationship OneToMany {
+  Transaction to Refund{transaction required}
+}
+
+// Notes:
+// - idempotencyKey is unique at the database level deliberately: the spec's
+//   distributed-idempotency requirement (Chunk 5 §3) needs a hard
+//   constraint, not just application-level checking, so a retried request
+//   under load can't race its way into two Transaction rows.
+// - The card 3DS / mobile-money STK challenge-and-webhook-confirmation flow
+//   (Chunk 5 §2, Figure 5.2) is state-machine behavior implemented in the
+//   service layer on top of this entity, not additional generated CRUD —
+//   see TASK_BREAKDOWN.md Chunk 4 for what's hand-written here.

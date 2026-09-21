@@ -1,0 +1,9 @@
+// ============================================================================
+// Cross-cutting generation options — applies to every entity above.
+// Keep this file last on the jhipster jdl command line.
+// ============================================================================
+
+dto * with mapstruct
+service * with serviceImpl
+paginate * with pagination
+filter *

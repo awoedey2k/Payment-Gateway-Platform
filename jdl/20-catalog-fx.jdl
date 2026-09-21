@@ -1,0 +1,57 @@
+// ============================================================================
+// Module: Catalog & FX  (maps to Chunk 2 of TASK_BREAKDOWN.md)
+// Spec reference: Technical Specification, Chunk 3 (Country-Specific
+// Payment Method Matrix) and Chunk 1 §3.2 (ForexRate engine)
+// ============================================================================
+
+entity Currency {
+  code String required unique maxlength(3)
+  name String required
+  minorUnit Integer required
+}
+
+entity Country {
+  isoCode String required unique maxlength(2)
+  name String required
+  defaultCurrencyCode String required
+}
+
+entity PaymentMethod {
+  code String required unique
+  displayName String required
+  category PaymentMethodCategory required
+}
+
+entity CountryPaymentMethod {
+  minTxnAmount BigDecimal required
+  maxTxnAmount BigDecimal required
+  supportsRecurring Boolean required
+  supportsInstantRefund Boolean required
+  isActive Boolean required
+}
+
+entity ForexRate {
+  baseCurrency String required
+  quoteCurrency String required
+  rate BigDecimal required
+  platformSpreadBps Integer required
+  lockedAt Instant required
+  expiresAt Instant required
+}
+
+enum PaymentMethodCategory {
+  CARD, BANK_TRANSFER, MOBILE_MONEY, USSD, WALLET
+}
+
+relationship ManyToOne {
+  CountryPaymentMethod{country required} to Country
+  CountryPaymentMethod{paymentMethod required} to PaymentMethod
+}
+
+// Notes:
+// - Currency/Country/PaymentMethod are shared reference data — no tenant
+//   relationship, unlike almost everything else in this project.
+// - ForexRate rows are immutable, append-only quotes (lockedAt/expiresAt),
+//   matching the "rate locked at payout-batch creation, not re-quoted at
+//   wire-dispatch time" behavior described in the spec's Chunk 7 §3 — do
+//   not model this as a single mutable "current rate" row.

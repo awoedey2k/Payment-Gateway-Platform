@@ -1,0 +1,95 @@
+// ============================================================================
+// Module: Settlement  (maps to Chunks 6 & 7 of TASK_BREAKDOWN.md)
+// Spec reference: Technical Specification, Chunk 6 (Multi-Currency Tenant
+// Wallets, Double-Entry Ledger) and Chunk 7 (Fee Engine, Payout Schedules,
+// Cross-Border Clearing)
+// ============================================================================
+
+entity TenantWallet {
+  currencyCode String required
+  availableBalance BigDecimal required
+  lockedBalance BigDecimal required
+}
+
+entity LedgerAccount {
+  accountCode String required unique
+  accountType LedgerAccountType required
+  currencyCode String required
+}
+
+entity JournalEntry {
+  reference String required unique
+  description String required
+  postedAt Instant required
+}
+
+entity JournalLine {
+  debitAmount BigDecimal
+  creditAmount BigDecimal
+}
+
+entity TenantFeeConfig {
+  fixedFee BigDecimal required
+  percentageFee BigDecimal required
+  capAmount BigDecimal
+  feeBearer FeeBearer required
+  isActive Boolean required
+}
+
+entity PayoutSchedule {
+  frequencyMode PayoutFrequency required
+  thresholdAmount BigDecimal required
+  isActive Boolean required
+}
+
+entity SettlementBatch {
+  reference String required unique
+  status SettlementBatchStatus required
+  totalAmount BigDecimal required
+  currencyCode String required
+  scheduledAt Instant required
+  completedAt Instant
+}
+
+enum LedgerAccountType {
+  ASSET, LIABILITY, REVENUE, EXPENSE
+}
+
+enum FeeBearer {
+  MERCHANT, CUSTOMER
+}
+
+enum PayoutFrequency {
+  DAILY, WEEKLY, MONTHLY, MANUAL
+}
+
+enum SettlementBatchStatus {
+  SCHEDULED, PROCESSING, COMPLETED, FAILED
+}
+
+relationship ManyToOne {
+  TenantWallet{tenant required} to CorporateTenant
+  TenantFeeConfig{tenant required} to CorporateTenant
+  TenantFeeConfig{countryPaymentMethod required} to CountryPaymentMethod
+  PayoutSchedule{tenant required} to CorporateTenant
+  SettlementBatch{tenant required} to CorporateTenant
+  JournalLine{account required} to LedgerAccount
+  JournalLine{journalEntry required} to JournalEntry
+}
+
+relationship OneToMany {
+  JournalEntry to JournalLine{journalEntry required}
+}
+
+// Notes:
+// - JournalEntry/JournalLine model the double-entry ledger as the spec's
+//   Chunk 6 describes it: every state change (hold, release, dispute win,
+//   dispute loss) is its own independently-balanced JournalEntry with two
+//   or more JournalLines, never an edit to a single mutable balance field.
+//   TenantWallet.availableBalance/lockedBalance are derived snapshots kept
+//   in sync by the service layer, not the source of truth — see
+//   TASK_BREAKDOWN.md Chunk 6 for the reconciliation requirement this
+//   implies (ledger and wallet snapshot must cross-check).
+// - SettlementBatch is deliberately its own entity per tenant per run
+//   (Chunk 7 §2.2's per-tenant batch isolation requirement) so one
+//   tenant's bank rejection never blocks another tenant's payout.

@@ -1,0 +1,37 @@
+// ============================================================================
+// Module: Routing  (maps to Chunk 3 of TASK_BREAKDOWN.md)
+// Spec reference: Technical Specification, Chunk 4 (Gateway Adapter
+// Architecture, Dynamic Checkout Rail Discovery)
+// ============================================================================
+
+entity RoutingRule {
+  priority Integer required
+  scope RoutingRuleScope required
+  countryCode String
+  currencyCode String
+  cardBrand String
+  primaryAdapter String required
+  fallbackAdapter String
+  maxRetries Integer required
+  isActive Boolean required
+}
+
+enum RoutingRuleScope {
+  TENANT_CUSTOM, PLATFORM_GLOBAL
+}
+
+relationship ManyToOne {
+  RoutingRule{tenant} to CorporateTenant
+}
+
+// Notes:
+// - tenant is optional on RoutingRule: PLATFORM_GLOBAL rules (priority
+//   101+, the default fallback) have no owning tenant, while TENANT_CUSTOM
+//   rules (priority 1-100) do — this mirrors the two-tier evaluation order
+//   in the spec's Figure 4.2 directly, rather than needing a separate
+//   PlatformRoutingRule entity.
+// - primaryAdapter/fallbackAdapter are plain strings identifying an
+//   acquirer adapter (e.g. "PAYSTACK", "FLUTTERWAVE") rather than a
+//   relationship to a generated GatewayAdapter entity — the adapters
+//   themselves are code (Java interfaces implementing a common
+//   GatewayAdapter contract per Chunk 1), not configuration data.
