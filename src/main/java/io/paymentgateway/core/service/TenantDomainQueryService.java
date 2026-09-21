@@ -83,6 +83,8 @@ public class TenantDomainQueryService extends QueryService<TenantDomain> {
                     buildRangeSpecification(criteria.getId(), TenantDomain_.id),
                     buildStringSpecification(criteria.getCustomDomain(), TenantDomain_.customDomain),
                     buildStringSpecification(criteria.getSupportedLocales(), TenantDomain_.supportedLocales),
+                    buildStringSpecification(criteria.getDefaultLocale(), TenantDomain_.defaultLocale),
+                    buildStringSpecification(criteria.getFallbackLocale(), TenantDomain_.fallbackLocale),
                     buildSpecification(criteria.getIsVerified(), TenantDomain_.isVerified),
                     buildSpecification(criteria.getTenantId(), root ->
                         root.join(TenantDomain_.tenant, JoinType.LEFT).get(CorporateTenant_.id)

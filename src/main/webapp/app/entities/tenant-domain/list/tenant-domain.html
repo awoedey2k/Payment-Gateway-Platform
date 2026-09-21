@@ -53,6 +53,18 @@
                 <fa-icon class="p-1" icon="sort" />
               </div>
             </th>
+            <th scope="col" jhiSortBy="defaultLocale">
+              <div class="d-flex">
+                <span>Default Locale</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fallbackLocale">
+              <div class="d-flex">
+                <span>Fallback Locale</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
             <th scope="col" jhiSortBy="isVerified">
               <div class="d-flex">
                 <span>Is Verified</span>
@@ -76,6 +88,8 @@
               </td>
               <td>{{ tenantDomain.customDomain }}</td>
               <td>{{ tenantDomain.supportedLocales }}</td>
+              <td>{{ tenantDomain.defaultLocale }}</td>
+              <td>{{ tenantDomain.fallbackLocale }}</td>
               <td>{{ tenantDomain.isVerified }}</td>
               <td>
                 @if (tenantDomain.tenant) {

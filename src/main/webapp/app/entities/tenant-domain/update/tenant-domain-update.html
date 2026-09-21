@@ -45,6 +45,30 @@
           />
         </div>
 
+        <div class="mb-3">
+          <label class="form-label" for="field_defaultLocale">Default Locale</label>
+          <input
+            type="text"
+            class="form-control"
+            name="defaultLocale"
+            id="field_defaultLocale"
+            data-cy="defaultLocale"
+            formControlName="defaultLocale"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_fallbackLocale">Fallback Locale</label>
+          <input
+            type="text"
+            class="form-control"
+            name="fallbackLocale"
+            id="field_fallbackLocale"
+            data-cy="fallbackLocale"
+            formControlName="fallbackLocale"
+          />
+        </div>
+
         @let isVerifiedRef = editForm.get('isVerified')!;
         <div class="mb-3 form-check">
           <input

@@ -74,6 +74,8 @@ class TenantDomainCriteriaTest {
         tenantDomainCriteria.id();
         tenantDomainCriteria.customDomain();
         tenantDomainCriteria.supportedLocales();
+        tenantDomainCriteria.defaultLocale();
+        tenantDomainCriteria.fallbackLocale();
         tenantDomainCriteria.isVerified();
         tenantDomainCriteria.tenantId();
         tenantDomainCriteria.distinct();
@@ -85,6 +87,8 @@ class TenantDomainCriteriaTest {
                 condition.apply(criteria.getId()) &&
                 condition.apply(criteria.getCustomDomain()) &&
                 condition.apply(criteria.getSupportedLocales()) &&
+                condition.apply(criteria.getDefaultLocale()) &&
+                condition.apply(criteria.getFallbackLocale()) &&
                 condition.apply(criteria.getIsVerified()) &&
                 condition.apply(criteria.getTenantId()) &&
                 condition.apply(criteria.getDistinct()),
@@ -101,6 +105,8 @@ class TenantDomainCriteriaTest {
                 condition.apply(criteria.getId(), copy.getId()) &&
                 condition.apply(criteria.getCustomDomain(), copy.getCustomDomain()) &&
                 condition.apply(criteria.getSupportedLocales(), copy.getSupportedLocales()) &&
+                condition.apply(criteria.getDefaultLocale(), copy.getDefaultLocale()) &&
+                condition.apply(criteria.getFallbackLocale(), copy.getFallbackLocale()) &&
                 condition.apply(criteria.getIsVerified(), copy.getIsVerified()) &&
                 condition.apply(criteria.getTenantId(), copy.getTenantId()) &&
                 condition.apply(criteria.getDistinct(), copy.getDistinct()),

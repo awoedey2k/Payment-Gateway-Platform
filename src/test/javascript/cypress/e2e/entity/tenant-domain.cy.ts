@@ -14,7 +14,7 @@ describe('TenantDomain e2e test', () => {
   const tenantDomainPageUrl = '/tenant-domain';
   let username: string;
   let password: string;
-  const tenantDomainSample = { customDomain: 'outside ah', isVerified: true };
+  const tenantDomainSample = { customDomain: 'shrilly but', isVerified: true };
 
   let tenantDomain;
   let corporateTenant;
@@ -214,6 +214,12 @@ describe('TenantDomain e2e test', () => {
 
       cy.get(`[data-cy="supportedLocales"]`).type('where however');
       cy.get(`[data-cy="supportedLocales"]`).should('have.value', 'where however');
+
+      cy.get(`[data-cy="defaultLocale"]`).type('smuggle than');
+      cy.get(`[data-cy="defaultLocale"]`).should('have.value', 'smuggle than');
+
+      cy.get(`[data-cy="fallbackLocale"]`).type('seagull');
+      cy.get(`[data-cy="fallbackLocale"]`).should('have.value', 'seagull');
 
       cy.get(`[data-cy="isVerified"]`).should('not.be.checked');
       cy.get(`[data-cy="isVerified"]`).click();

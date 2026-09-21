@@ -33,7 +33,7 @@ public class ApiKey implements Serializable {
     private String keyPrefix;
 
     @NotNull
-    @Column(name = "key_hash", nullable = false)
+    @Column(name = "key_hash", nullable = false, unique = true)
     private String keyHash;
 
     @NotNull

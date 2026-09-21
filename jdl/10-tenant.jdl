@@ -26,7 +26,7 @@ entity TenantDirector {
 
 entity ApiKey {
   keyPrefix String required
-  keyHash String required
+  keyHash String required unique
   environment ApiEnvironment required
   isActive Boolean required
   issuedAt Instant required
@@ -37,6 +37,8 @@ entity ApiKey {
 entity TenantDomain {
   customDomain String required unique
   supportedLocales String
+  defaultLocale String
+  fallbackLocale String
   isVerified Boolean required
 }
 
@@ -67,6 +69,10 @@ relationship OneToMany {
 }
 
 // Notes:
+// - keyHash is unique so authentication is a single indexed lookup by hash
+//   (HMAC-SHA-256 keyed with a server-side pepper; see docs/modules/tenant.md).
+// - TenantDomain.supportedLocales is a comma-separated list (e.g. "en_US,fr_SN");
+//   defaultLocale / fallbackLocale drive checkout locale hydration (spec Chunk 2 §5).
 // - keyHash stores a hash of the API key, never the raw secret — matches
 //   the dual-active-window rotation pattern in Chunk 2 (Key A / Key B,
 //   grace period, explicit revoke).

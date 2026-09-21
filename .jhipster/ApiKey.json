@@ -13,7 +13,7 @@
     {
       "fieldName": "keyHash",
       "fieldType": "String",
-      "fieldValidateRules": ["required"]
+      "fieldValidateRules": ["required", "unique"]
     },
     {
       "fieldName": "environment",

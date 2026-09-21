@@ -30,6 +30,10 @@ public class TenantDomainCriteria implements Serializable, Criteria {
 
     private StringFilter supportedLocales;
 
+    private StringFilter defaultLocale;
+
+    private StringFilter fallbackLocale;
+
     private BooleanFilter isVerified;
 
     private LongFilter tenantId;
@@ -42,6 +46,8 @@ public class TenantDomainCriteria implements Serializable, Criteria {
         this.id = other.optionalId().map(LongFilter::copy).orElse(null);
         this.customDomain = other.optionalCustomDomain().map(StringFilter::copy).orElse(null);
         this.supportedLocales = other.optionalSupportedLocales().map(StringFilter::copy).orElse(null);
+        this.defaultLocale = other.optionalDefaultLocale().map(StringFilter::copy).orElse(null);
+        this.fallbackLocale = other.optionalFallbackLocale().map(StringFilter::copy).orElse(null);
         this.isVerified = other.optionalIsVerified().map(BooleanFilter::copy).orElse(null);
         this.tenantId = other.optionalTenantId().map(LongFilter::copy).orElse(null);
         this.distinct = other.distinct;
@@ -107,6 +113,44 @@ public class TenantDomainCriteria implements Serializable, Criteria {
 
     public void setSupportedLocales(StringFilter supportedLocales) {
         this.supportedLocales = supportedLocales;
+    }
+
+    public StringFilter getDefaultLocale() {
+        return defaultLocale;
+    }
+
+    public Optional<StringFilter> optionalDefaultLocale() {
+        return Optional.ofNullable(defaultLocale);
+    }
+
+    public StringFilter defaultLocale() {
+        if (defaultLocale == null) {
+            setDefaultLocale(new StringFilter());
+        }
+        return defaultLocale;
+    }
+
+    public void setDefaultLocale(StringFilter defaultLocale) {
+        this.defaultLocale = defaultLocale;
+    }
+
+    public StringFilter getFallbackLocale() {
+        return fallbackLocale;
+    }
+
+    public Optional<StringFilter> optionalFallbackLocale() {
+        return Optional.ofNullable(fallbackLocale);
+    }
+
+    public StringFilter fallbackLocale() {
+        if (fallbackLocale == null) {
+            setFallbackLocale(new StringFilter());
+        }
+        return fallbackLocale;
+    }
+
+    public void setFallbackLocale(StringFilter fallbackLocale) {
+        this.fallbackLocale = fallbackLocale;
     }
 
     public BooleanFilter getIsVerified() {
@@ -179,6 +223,8 @@ public class TenantDomainCriteria implements Serializable, Criteria {
             Objects.equals(id, that.id) &&
             Objects.equals(customDomain, that.customDomain) &&
             Objects.equals(supportedLocales, that.supportedLocales) &&
+            Objects.equals(defaultLocale, that.defaultLocale) &&
+            Objects.equals(fallbackLocale, that.fallbackLocale) &&
             Objects.equals(isVerified, that.isVerified) &&
             Objects.equals(tenantId, that.tenantId) &&
             Objects.equals(distinct, that.distinct)
@@ -187,7 +233,7 @@ public class TenantDomainCriteria implements Serializable, Criteria {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, customDomain, supportedLocales, isVerified, tenantId, distinct);
+        return Objects.hash(id, customDomain, supportedLocales, defaultLocale, fallbackLocale, isVerified, tenantId, distinct);
     }
 
     // prettier-ignore
@@ -197,6 +243,8 @@ public class TenantDomainCriteria implements Serializable, Criteria {
             optionalId().map(f -> "id=" + f + ", ").orElse("") +
             optionalCustomDomain().map(f -> "customDomain=" + f + ", ").orElse("") +
             optionalSupportedLocales().map(f -> "supportedLocales=" + f + ", ").orElse("") +
+            optionalDefaultLocale().map(f -> "defaultLocale=" + f + ", ").orElse("") +
+            optionalFallbackLocale().map(f -> "fallbackLocale=" + f + ", ").orElse("") +
             optionalIsVerified().map(f -> "isVerified=" + f + ", ").orElse("") +
             optionalTenantId().map(f -> "tenantId=" + f + ", ").orElse("") +
             optionalDistinct().map(f -> "distinct=" + f + ", ").orElse("") +

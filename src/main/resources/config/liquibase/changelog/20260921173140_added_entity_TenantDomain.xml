@@ -20,6 +20,12 @@
             <column name="supported_locales" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="default_locale" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="fallback_locale" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <column name="is_verified" type="boolean">
                 <constraints nullable="false" />
             </column>

@@ -7,16 +7,18 @@ export const sampleWithRequiredData: ITenantDomain = {
 };
 
 export const sampleWithPartialData: ITenantDomain = {
-  id: 27711,
-  customDomain: 'past mysterious',
-  supportedLocales: 'derby equatorial',
-  isVerified: false,
+  id: 14969,
+  customDomain: 'wearily',
+  supportedLocales: 'hollow cop-out',
+  isVerified: true,
 };
 
 export const sampleWithFullData: ITenantDomain = {
   id: 6582,
   customDomain: 'limping sharply',
   supportedLocales: 'whistle apropos',
+  defaultLocale: 'ha',
+  fallbackLocale: 'wetly exactly woeful',
   isVerified: true,
 };
 

@@ -18,7 +18,7 @@
                 <constraints nullable="false" />
             </column>
             <column name="key_hash" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_api_key__key_hash" />
             </column>
             <column name="environment" type="varchar(255)">
                 <constraints nullable="false" />

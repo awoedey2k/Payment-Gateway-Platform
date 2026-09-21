@@ -4,6 +4,8 @@ export interface ITenantDomain {
   id: number;
   customDomain?: string | null;
   supportedLocales?: string | null;
+  defaultLocale?: string | null;
+  fallbackLocale?: string | null;
   isVerified?: boolean | null;
   tenant?: Pick<ICorporateTenant, 'id'> | null;
 }

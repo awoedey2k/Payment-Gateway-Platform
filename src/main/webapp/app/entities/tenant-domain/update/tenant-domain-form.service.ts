@@ -20,6 +20,8 @@ type TenantDomainFormGroupContent = {
   id: FormControl<ITenantDomain['id'] | NewTenantDomain['id']>;
   customDomain: FormControl<ITenantDomain['customDomain']>;
   supportedLocales: FormControl<ITenantDomain['supportedLocales']>;
+  defaultLocale: FormControl<ITenantDomain['defaultLocale']>;
+  fallbackLocale: FormControl<ITenantDomain['fallbackLocale']>;
   isVerified: FormControl<ITenantDomain['isVerified']>;
   tenant: FormControl<ITenantDomain['tenant']>;
 };
@@ -46,6 +48,8 @@ export class TenantDomainFormService {
         validators: [Validators.required],
       }),
       supportedLocales: new FormControl(tenantDomainRawValue.supportedLocales),
+      defaultLocale: new FormControl(tenantDomainRawValue.defaultLocale),
+      fallbackLocale: new FormControl(tenantDomainRawValue.fallbackLocale),
       isVerified: new FormControl(tenantDomainRawValue.isVerified, {
         validators: [Validators.required],
       }),

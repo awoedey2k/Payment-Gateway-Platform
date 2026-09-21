@@ -33,6 +33,12 @@ public class TenantDomain implements Serializable {
     @Column(name = "supported_locales")
     private String supportedLocales;
 
+    @Column(name = "default_locale")
+    private String defaultLocale;
+
+    @Column(name = "fallback_locale")
+    private String fallbackLocale;
+
     @NotNull
     @Column(name = "is_verified", nullable = false)
     private Boolean isVerified;
@@ -81,6 +87,32 @@ public class TenantDomain implements Serializable {
 
     public void setSupportedLocales(String supportedLocales) {
         this.supportedLocales = supportedLocales;
+    }
+
+    public String getDefaultLocale() {
+        return this.defaultLocale;
+    }
+
+    public TenantDomain defaultLocale(String defaultLocale) {
+        this.setDefaultLocale(defaultLocale);
+        return this;
+    }
+
+    public void setDefaultLocale(String defaultLocale) {
+        this.defaultLocale = defaultLocale;
+    }
+
+    public String getFallbackLocale() {
+        return this.fallbackLocale;
+    }
+
+    public TenantDomain fallbackLocale(String fallbackLocale) {
+        this.setFallbackLocale(fallbackLocale);
+        return this;
+    }
+
+    public void setFallbackLocale(String fallbackLocale) {
+        this.fallbackLocale = fallbackLocale;
     }
 
     public Boolean getIsVerified() {
@@ -135,6 +167,8 @@ public class TenantDomain implements Serializable {
             "id=" + getId() +
             ", customDomain='" + getCustomDomain() + "'" +
             ", supportedLocales='" + getSupportedLocales() + "'" +
+            ", defaultLocale='" + getDefaultLocale() + "'" +
+            ", fallbackLocale='" + getFallbackLocale() + "'" +
             ", isVerified='" + getIsVerified() + "'" +
             "}";
     }

@@ -41,6 +41,12 @@ class TenantDomainResourceIT {
     private static final String DEFAULT_SUPPORTED_LOCALES = "AAAAAAAAAA";
     private static final String UPDATED_SUPPORTED_LOCALES = "BBBBBBBBBB";
 
+    private static final String DEFAULT_DEFAULT_LOCALE = "AAAAAAAAAA";
+    private static final String UPDATED_DEFAULT_LOCALE = "BBBBBBBBBB";
+
+    private static final String DEFAULT_FALLBACK_LOCALE = "AAAAAAAAAA";
+    private static final String UPDATED_FALLBACK_LOCALE = "BBBBBBBBBB";
+
     private static final Boolean DEFAULT_IS_VERIFIED = false;
     private static final Boolean UPDATED_IS_VERIFIED = true;
 
@@ -79,6 +85,8 @@ class TenantDomainResourceIT {
         TenantDomain tenantDomain = new TenantDomain()
             .customDomain(DEFAULT_CUSTOM_DOMAIN)
             .supportedLocales(DEFAULT_SUPPORTED_LOCALES)
+            .defaultLocale(DEFAULT_DEFAULT_LOCALE)
+            .fallbackLocale(DEFAULT_FALLBACK_LOCALE)
             .isVerified(DEFAULT_IS_VERIFIED);
         // Add required entity
         CorporateTenant corporateTenant;
@@ -103,6 +111,8 @@ class TenantDomainResourceIT {
         TenantDomain updatedTenantDomain = new TenantDomain()
             .customDomain(UPDATED_CUSTOM_DOMAIN)
             .supportedLocales(UPDATED_SUPPORTED_LOCALES)
+            .defaultLocale(UPDATED_DEFAULT_LOCALE)
+            .fallbackLocale(UPDATED_FALLBACK_LOCALE)
             .isVerified(UPDATED_IS_VERIFIED);
         // Add required entity
         CorporateTenant corporateTenant;
@@ -220,6 +230,8 @@ class TenantDomainResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(tenantDomain.getId().intValue())))
             .andExpect(jsonPath("$.[*].customDomain").value(hasItem(DEFAULT_CUSTOM_DOMAIN)))
             .andExpect(jsonPath("$.[*].supportedLocales").value(hasItem(DEFAULT_SUPPORTED_LOCALES)))
+            .andExpect(jsonPath("$.[*].defaultLocale").value(hasItem(DEFAULT_DEFAULT_LOCALE)))
+            .andExpect(jsonPath("$.[*].fallbackLocale").value(hasItem(DEFAULT_FALLBACK_LOCALE)))
             .andExpect(jsonPath("$.[*].isVerified").value(hasItem(DEFAULT_IS_VERIFIED)));
     }
 
@@ -237,6 +249,8 @@ class TenantDomainResourceIT {
             .andExpect(jsonPath("$.id").value(tenantDomain.getId().intValue()))
             .andExpect(jsonPath("$.customDomain").value(DEFAULT_CUSTOM_DOMAIN))
             .andExpect(jsonPath("$.supportedLocales").value(DEFAULT_SUPPORTED_LOCALES))
+            .andExpect(jsonPath("$.defaultLocale").value(DEFAULT_DEFAULT_LOCALE))
+            .andExpect(jsonPath("$.fallbackLocale").value(DEFAULT_FALLBACK_LOCALE))
             .andExpect(jsonPath("$.isVerified").value(DEFAULT_IS_VERIFIED));
     }
 
@@ -375,6 +389,127 @@ class TenantDomainResourceIT {
 
     @Test
     @Transactional
+    void getAllTenantDomainsByDefaultLocaleIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where defaultLocale equals to
+        defaultTenantDomainFiltering("defaultLocale.equals=" + DEFAULT_DEFAULT_LOCALE, "defaultLocale.equals=" + UPDATED_DEFAULT_LOCALE);
+    }
+
+    @Test
+    @Transactional
+    void getAllTenantDomainsByDefaultLocaleIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where defaultLocale in
+        defaultTenantDomainFiltering(
+            "defaultLocale.in=" + DEFAULT_DEFAULT_LOCALE + "," + UPDATED_DEFAULT_LOCALE,
+            "defaultLocale.in=" + UPDATED_DEFAULT_LOCALE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllTenantDomainsByDefaultLocaleIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where defaultLocale is not null
+        defaultTenantDomainFiltering("defaultLocale.specified=true", "defaultLocale.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllTenantDomainsByDefaultLocaleContainsSomething() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where defaultLocale contains
+        defaultTenantDomainFiltering(
+            "defaultLocale.contains=" + DEFAULT_DEFAULT_LOCALE,
+            "defaultLocale.contains=" + UPDATED_DEFAULT_LOCALE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllTenantDomainsByDefaultLocaleNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where defaultLocale does not contain
+        defaultTenantDomainFiltering(
+            "defaultLocale.doesNotContain=" + UPDATED_DEFAULT_LOCALE,
+            "defaultLocale.doesNotContain=" + DEFAULT_DEFAULT_LOCALE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllTenantDomainsByFallbackLocaleIsEqualToSomething() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where fallbackLocale equals to
+        defaultTenantDomainFiltering(
+            "fallbackLocale.equals=" + DEFAULT_FALLBACK_LOCALE,
+            "fallbackLocale.equals=" + UPDATED_FALLBACK_LOCALE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllTenantDomainsByFallbackLocaleIsInShouldWork() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where fallbackLocale in
+        defaultTenantDomainFiltering(
+            "fallbackLocale.in=" + DEFAULT_FALLBACK_LOCALE + "," + UPDATED_FALLBACK_LOCALE,
+            "fallbackLocale.in=" + UPDATED_FALLBACK_LOCALE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllTenantDomainsByFallbackLocaleIsNullOrNotNull() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where fallbackLocale is not null
+        defaultTenantDomainFiltering("fallbackLocale.specified=true", "fallbackLocale.specified=false");
+    }
+
+    @Test
+    @Transactional
+    void getAllTenantDomainsByFallbackLocaleContainsSomething() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where fallbackLocale contains
+        defaultTenantDomainFiltering(
+            "fallbackLocale.contains=" + DEFAULT_FALLBACK_LOCALE,
+            "fallbackLocale.contains=" + UPDATED_FALLBACK_LOCALE
+        );
+    }
+
+    @Test
+    @Transactional
+    void getAllTenantDomainsByFallbackLocaleNotContainsSomething() throws Exception {
+        // Initialize the database
+        insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
+
+        // Get all the tenantDomainList where fallbackLocale does not contain
+        defaultTenantDomainFiltering(
+            "fallbackLocale.doesNotContain=" + UPDATED_FALLBACK_LOCALE,
+            "fallbackLocale.doesNotContain=" + DEFAULT_FALLBACK_LOCALE
+        );
+    }
+
+    @Test
+    @Transactional
     void getAllTenantDomainsByIsVerifiedIsEqualToSomething() throws Exception {
         // Initialize the database
         insertedTenantDomain = tenantDomainRepository.saveAndFlush(tenantDomain);
@@ -444,6 +579,8 @@ class TenantDomainResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(tenantDomain.getId().intValue())))
             .andExpect(jsonPath("$.[*].customDomain").value(hasItem(DEFAULT_CUSTOM_DOMAIN)))
             .andExpect(jsonPath("$.[*].supportedLocales").value(hasItem(DEFAULT_SUPPORTED_LOCALES)))
+            .andExpect(jsonPath("$.[*].defaultLocale").value(hasItem(DEFAULT_DEFAULT_LOCALE)))
+            .andExpect(jsonPath("$.[*].fallbackLocale").value(hasItem(DEFAULT_FALLBACK_LOCALE)))
             .andExpect(jsonPath("$.[*].isVerified").value(hasItem(DEFAULT_IS_VERIFIED)));
 
         // Check, that the count call also returns 1
@@ -492,7 +629,12 @@ class TenantDomainResourceIT {
         TenantDomain updatedTenantDomain = tenantDomainRepository.findById(tenantDomain.getId()).orElseThrow();
         // Disconnect from session so that the updates on updatedTenantDomain are not directly saved in db
         em.detach(updatedTenantDomain);
-        updatedTenantDomain.customDomain(UPDATED_CUSTOM_DOMAIN).supportedLocales(UPDATED_SUPPORTED_LOCALES).isVerified(UPDATED_IS_VERIFIED);
+        updatedTenantDomain
+            .customDomain(UPDATED_CUSTOM_DOMAIN)
+            .supportedLocales(UPDATED_SUPPORTED_LOCALES)
+            .defaultLocale(UPDATED_DEFAULT_LOCALE)
+            .fallbackLocale(UPDATED_FALLBACK_LOCALE)
+            .isVerified(UPDATED_IS_VERIFIED);
         TenantDomainDTO tenantDomainDTO = tenantDomainMapper.toDto(updatedTenantDomain);
 
         restTenantDomainMockMvc
@@ -585,6 +727,7 @@ class TenantDomainResourceIT {
         partialUpdatedTenantDomain
             .customDomain(UPDATED_CUSTOM_DOMAIN)
             .supportedLocales(UPDATED_SUPPORTED_LOCALES)
+            .defaultLocale(UPDATED_DEFAULT_LOCALE)
             .isVerified(UPDATED_IS_VERIFIED);
 
         restTenantDomainMockMvc
@@ -619,6 +762,8 @@ class TenantDomainResourceIT {
         partialUpdatedTenantDomain
             .customDomain(UPDATED_CUSTOM_DOMAIN)
             .supportedLocales(UPDATED_SUPPORTED_LOCALES)
+            .defaultLocale(UPDATED_DEFAULT_LOCALE)
+            .fallbackLocale(UPDATED_FALLBACK_LOCALE)
             .isVerified(UPDATED_IS_VERIFIED);
 
         restTenantDomainMockMvc

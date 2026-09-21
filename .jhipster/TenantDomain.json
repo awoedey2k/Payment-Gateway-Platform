@@ -15,6 +15,14 @@
       "fieldType": "String"
     },
     {
+      "fieldName": "defaultLocale",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "fallbackLocale",
+      "fieldType": "String"
+    },
+    {
       "fieldName": "isVerified",
       "fieldType": "Boolean",
       "fieldValidateRules": ["required"]

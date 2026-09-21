@@ -17,6 +17,10 @@ public class TenantDomainDTO implements Serializable {
 
     private String supportedLocales;
 
+    private String defaultLocale;
+
+    private String fallbackLocale;
+
     @NotNull
     private Boolean isVerified;
 
@@ -45,6 +49,22 @@ public class TenantDomainDTO implements Serializable {
 
     public void setSupportedLocales(String supportedLocales) {
         this.supportedLocales = supportedLocales;
+    }
+
+    public String getDefaultLocale() {
+        return defaultLocale;
+    }
+
+    public void setDefaultLocale(String defaultLocale) {
+        this.defaultLocale = defaultLocale;
+    }
+
+    public String getFallbackLocale() {
+        return fallbackLocale;
+    }
+
+    public void setFallbackLocale(String fallbackLocale) {
+        this.fallbackLocale = fallbackLocale;
     }
 
     public Boolean getIsVerified() {
@@ -91,6 +111,8 @@ public class TenantDomainDTO implements Serializable {
             "id=" + getId() +
             ", customDomain='" + getCustomDomain() + "'" +
             ", supportedLocales='" + getSupportedLocales() + "'" +
+            ", defaultLocale='" + getDefaultLocale() + "'" +
+            ", fallbackLocale='" + getFallbackLocale() + "'" +
             ", isVerified='" + getIsVerified() + "'" +
             ", tenant=" + getTenant() +
             "}";

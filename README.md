@@ -111,7 +111,7 @@ jhipster jdl jdl/00-app-config.jdl jdl/10-tenant.jdl jdl/20-catalog-fx.jdl jdl/3
   --skip-git --skip-fake-data
 ```
 
-`--skip-fake-data` is stored in `.yo-rc.json` by the first run; `skipFakeData` is not a JDL keyword, so keep the flag on the command line. The generator prints a `paginate option is deprecated` warning; it is harmless (`paginate` is still the only JDL spelling).
+`.yo-resolve` tells the generator never to overwrite this `README.md`. `--skip-fake-data` is stored in `.yo-rc.json` by the first run; `skipFakeData` is not a JDL keyword, so keep the flag on the command line. The generator prints a `paginate option is deprecated` warning; it is harmless (`paginate` is still the only JDL spelling).
 
 ## Working from the JHipster Docker container
 
@@ -127,4 +127,5 @@ If you run the generator from the `jhipster/jhipster:v9.4.0` container instead o
 - [`docs/technical-spec.md`](docs/technical-spec.md) — the full technical specification
 - [`docs/TASK_BREAKDOWN.md`](docs/TASK_BREAKDOWN.md) — chunk-by-chunk plan and acceptance criteria
 - [`docs/CLAUDE_CODE_KICKOFF_PROMPT.md`](docs/CLAUDE_CODE_KICKOFF_PROMPT.md) — the workflow rules for implementation sessions
+- [`docs/modules/tenant.md`](docs/modules/tenant.md) — Tenant & Identity module: state machine, KYC onboarding, API key rotation
 - [`docs/JHIPSTER_GENERATED_README.md`](docs/JHIPSTER_GENERATED_README.md) — the README JHipster generated (tooling reference: Sonar, Cypress, Docker, CI, …)

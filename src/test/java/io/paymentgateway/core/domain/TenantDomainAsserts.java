@@ -49,6 +49,8 @@ public class TenantDomainAsserts {
             .as("Verify TenantDomain relevant properties")
             .satisfies(a -> assertThat(a.getCustomDomain()).as("check customDomain").isEqualTo(expected.getCustomDomain()))
             .satisfies(a -> assertThat(a.getSupportedLocales()).as("check supportedLocales").isEqualTo(expected.getSupportedLocales()))
+            .satisfies(a -> assertThat(a.getDefaultLocale()).as("check defaultLocale").isEqualTo(expected.getDefaultLocale()))
+            .satisfies(a -> assertThat(a.getFallbackLocale()).as("check fallbackLocale").isEqualTo(expected.getFallbackLocale()))
             .satisfies(a -> assertThat(a.getIsVerified()).as("check isVerified").isEqualTo(expected.getIsVerified()));
     }
 
