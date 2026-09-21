@@ -39,10 +39,7 @@ public class TenantAccessGuard {
     /** @throws TenantOperationException HTTP 403 with the decision's error code when the tenant may not transact. */
     @Transactional(readOnly = true)
     public void assertCanTransact(Long tenantId, ApiEnvironment environment) {
-        TenantStatus status = tenants
-            .findById(tenantId)
-            .orElseThrow(() -> TenantOperationException.notFound("Tenant", tenantId))
-            .getStatus();
+        TenantStatus status = tenants.findStatusById(tenantId).orElseThrow(() -> TenantOperationException.notFound("Tenant", tenantId));
         TenantAccessDecision decision = decide(environment, status);
         if (!decision.isAllowed()) {
             throw TenantOperationException.forbidden(

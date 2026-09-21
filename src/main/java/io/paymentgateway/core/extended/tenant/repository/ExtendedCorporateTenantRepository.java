@@ -1,6 +1,7 @@
 package io.paymentgateway.core.extended.tenant.repository;
 
 import io.paymentgateway.core.domain.CorporateTenant;
+import io.paymentgateway.core.domain.enumeration.TenantStatus;
 import jakarta.persistence.LockModeType;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,4 +22,8 @@ public interface ExtendedCorporateTenantRepository extends JpaRepository<Corpora
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select t from CorporateTenant t where t.id = :id")
     Optional<CorporateTenant> findByIdForUpdate(@Param("id") Long id);
+
+    /** Current status straight from the database (a query, so never a possibly stale cached entity). */
+    @Query("select t.status from CorporateTenant t where t.id = :id")
+    Optional<TenantStatus> findStatusById(@Param("id") Long id);
 }

@@ -60,6 +60,12 @@ public class TenantAdminResource {
         return toResponse(onboarding.rejectManually(tenantId, request.reason()));
     }
 
+    /** Recovery for a screening that never finished; see {@link OnboardingService#resetStuckScreening}. */
+    @PostMapping("/tenants/{tenantId}/onboarding/reset")
+    public TenantStatusResponse resetScreening(@PathVariable Long tenantId, @Valid @RequestBody DecisionRequest request) {
+        return toResponse(onboarding.resetStuckScreening(tenantId, request.reason()));
+    }
+
     @PostMapping("/tenants/{tenantId}/status")
     public TenantStatusResponse changeStatus(@PathVariable Long tenantId, @Valid @RequestBody StatusChangeRequest request) {
         return toResponse(lifecycle.transition(tenantId, request.targetStatus(), request.reason()));

@@ -27,6 +27,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  *                                    -> (score 21-60) MANUAL_REVIEW  + tenant stays PENDING_REVIEW
  *                                    -> (score 61-100) REJECTED      + tenant REJECTED
  * approveManually() / rejectManually(): MANUAL_REVIEW -> APPROVED (+ACTIVE) | REJECTED (+REJECTED)
+ * resetStuckScreening(): PENDING -> NOT_STARTED (staff recovery)
  * </pre>
  *
  * The provider call-outs run <em>between</em> two short transactions, so no database transaction or tenant lock is held
@@ -98,6 +99,26 @@ public class OnboardingService {
         });
     }
 
+    /**
+     * Recovery for a screening that never finished (for example the process died between the two transactions), which would
+     * otherwise leave {@code kycStatus} at PENDING and every retry failing with {@code KYC_IN_PROGRESS}. If a screening is in
+     * fact still running, its result is discarded ({@code KYC_STATE_CHANGED}) rather than applied.
+     */
+    public CorporateTenant resetStuckScreening(Long tenantId, String reason) {
+        return tx.execute(status -> {
+            CorporateTenant tenant = lock(tenantId);
+            if (tenant.getKycStatus() != KycStatus.PENDING) {
+                throw TenantOperationException.conflict(
+                    "KYC_NOT_IN_PROGRESS",
+                    "Tenant " + tenantId + " kycStatus is " + tenant.getKycStatus() + "; nothing to reset"
+                );
+            }
+            tenant.setKycStatus(KycStatus.NOT_STARTED);
+            LOG.warn("KYC screening for tenant {} reset by staff: {}", tenantId, reason);
+            return tenants.save(tenant);
+        });
+    }
+
     private OnboardingSnapshot begin(Long tenantId) {
         CorporateTenant tenant = lock(tenantId);
         if (tenant.getStatus() != TenantStatus.PENDING_REVIEW) {
@@ -134,6 +155,13 @@ public class OnboardingService {
             throw TenantOperationException.conflict(
                 "KYC_STATE_CHANGED",
                 "Tenant " + tenantId + " kycStatus changed during screening to " + tenant.getKycStatus()
+            );
+        }
+        if (tenant.getStatus() != TenantStatus.PENDING_REVIEW) {
+            // e.g. staff suspended the tenant while the providers were being called: the result must not override that.
+            throw TenantOperationException.conflict(
+                "TENANT_STATUS_CHANGED",
+                "Tenant " + tenantId + " is now " + tenant.getStatus() + "; the screening result was discarded"
             );
         }
         tenant.setRiskScore(assessment.score());

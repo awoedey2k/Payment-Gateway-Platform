@@ -106,4 +106,31 @@ class KycScoringPolicyTest {
     void assessmentKeepsTheSignalsThatProducedIt() {
         assertThat(policy.assess(Set.of(KycSignal.NAME_MISMATCH)).signals()).containsExactly(KycSignal.NAME_MISMATCH);
     }
+
+    private static KycScoringPolicy policyWith(String nameMismatch, String registryUnavailable) {
+        return new KycScoringPolicy(
+            TestTenantProperties.with(
+                Map.of(
+                    "payment-gateway.tenant.kyc.weights.name-mismatch",
+                    nameMismatch,
+                    "payment-gateway.tenant.kyc.weights.registry-unavailable",
+                    registryUnavailable
+                )
+            )
+        );
+    }
+
+    /** The band boundaries exercised through assess() (signals -> score -> decision), not just decisionFor(int). */
+    @ParameterizedTest(name = "{0}+{1} -> score {2} -> {3}")
+    @CsvSource({ "20,0,20,APPROVE", "21,0,21,MANUAL_REVIEW", "30,30,60,MANUAL_REVIEW", "31,30,61,REJECT" })
+    void exactBandBoundariesThroughAssess(String nameMismatch, String registryUnavailable, int expectedScore, KycDecision expected) {
+        // registry-unavailable of 0 is only used to omit that signal below; the policy itself does not validate weights.
+        KycScoringPolicy policy = policyWith(nameMismatch, registryUnavailable);
+        Set<KycSignal> signals = "0".equals(registryUnavailable)
+            ? Set.of(KycSignal.NAME_MISMATCH)
+            : Set.of(KycSignal.NAME_MISMATCH, KycSignal.REGISTRY_UNAVAILABLE);
+        KycAssessment result = policy.assess(signals);
+        assertThat(result.score()).isEqualTo(expectedScore);
+        assertThat(result.decision()).isEqualTo(expected);
+    }
 }

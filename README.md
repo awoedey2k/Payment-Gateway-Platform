@@ -33,6 +33,8 @@ For client hot-reload while editing Angular code, run the backend as above and, 
 ./npmw start        # http://localhost:4200, proxied to the backend on :8080
 ```
 
+Regenerating from the JDL rewrites the affected Liquibase changelogs in place, so after a regeneration that changes an entity, drop and recreate your development database (`docker compose -f src/main/docker/postgresql.yml down`, then start again) instead of migrating it.
+
 No sample data is loaded (`skipFakeData` is on): random fake rows collide with the unique columns in this model and would put fictitious tenants and transactions in a payments database. Reference data is seeded deliberately (Chunk 2).
 
 ## Build and test

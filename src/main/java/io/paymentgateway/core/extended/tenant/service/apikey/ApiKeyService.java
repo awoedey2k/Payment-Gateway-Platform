@@ -9,6 +9,7 @@ import io.paymentgateway.core.extended.tenant.domain.IssuedApiKey;
 import io.paymentgateway.core.extended.tenant.domain.KeyRotationResult;
 import io.paymentgateway.core.extended.tenant.domain.TenantAccessDecision;
 import io.paymentgateway.core.extended.tenant.properties.TenantProperties;
+import io.paymentgateway.core.extended.tenant.repository.ApiKeyAuthRow;
 import io.paymentgateway.core.extended.tenant.repository.ExtendedApiKeyRepository;
 import io.paymentgateway.core.extended.tenant.repository.ExtendedCorporateTenantRepository;
 import io.paymentgateway.core.extended.tenant.service.TenantAccessGuard;
@@ -141,17 +142,19 @@ public class ApiKeyService {
         if (!ApiKeyGenerator.isWellFormed(presentedSecret)) {
             return Optional.empty();
         }
-        Optional<ApiKey> found = keys.findByKeyHash(hasher.hash(presentedSecret));
+        Optional<ApiKeyAuthRow> found = keys.findAuthRowByKeyHash(hasher.hash(presentedSecret));
         if (found.isEmpty()) {
             return Optional.empty();
         }
-        ApiKey key = found.orElseThrow();
-        if (!isUsable(key, clock.instant()) || key.getEnvironment() != ApiKeyGenerator.environmentOf(presentedSecret)) {
+        ApiKeyAuthRow row = found.orElseThrow();
+        if (
+            !isUsable(row.isActive(), row.revokedAt(), row.graceExpiresAt(), clock.instant()) ||
+            row.environment() != ApiKeyGenerator.environmentOf(presentedSecret)
+        ) {
             return Optional.empty();
         }
-        CorporateTenant tenant = key.getTenant();
-        ApiKeyPrincipal principal = new ApiKeyPrincipal(key.getId(), tenant.getId(), key.getEnvironment());
-        return Optional.of(new ApiKeyAuthResult(principal, TenantAccessGuard.decide(key.getEnvironment(), tenant.getStatus())));
+        ApiKeyPrincipal principal = new ApiKeyPrincipal(row.keyId(), row.tenantId(), row.environment());
+        return Optional.of(new ApiKeyAuthResult(principal, TenantAccessGuard.decide(row.environment(), row.tenantStatus())));
     }
 
     /** Flags keys whose grace period has lapsed as inactive. Returns how many were changed. */
@@ -198,11 +201,11 @@ public class ApiKeyService {
     }
 
     private static boolean isUsable(ApiKey key, Instant now) {
-        return (
-            Boolean.TRUE.equals(key.getIsActive()) &&
-            key.getRevokedAt() == null &&
-            (key.getGraceExpiresAt() == null || key.getGraceExpiresAt().isAfter(now))
-        );
+        return isUsable(key.getIsActive(), key.getRevokedAt(), key.getGraceExpiresAt(), now);
+    }
+
+    private static boolean isUsable(Boolean isActive, Instant revokedAt, Instant graceExpiresAt, Instant now) {
+        return Boolean.TRUE.equals(isActive) && revokedAt == null && (graceExpiresAt == null || graceExpiresAt.isAfter(now));
     }
 
     private IssuedApiKey create(CorporateTenant tenant, ApiEnvironment environment) {

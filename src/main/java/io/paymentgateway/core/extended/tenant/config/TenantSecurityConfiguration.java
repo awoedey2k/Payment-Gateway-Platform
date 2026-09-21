@@ -3,6 +3,7 @@ package io.paymentgateway.core.extended.tenant.config;
 import io.paymentgateway.core.extended.tenant.service.apikey.ApiKeyService;
 import io.paymentgateway.core.extended.tenant.web.ApiKeyAuthenticationFilter;
 import io.paymentgateway.core.extended.tenant.web.ApiKeyAuthenticationToken;
+import io.paymentgateway.core.extended.tenant.web.ProblemJson;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,7 +38,7 @@ public class TenantSecurityConfiguration {
             .exceptionHandling(exceptions ->
                 exceptions
                     .authenticationEntryPoint((request, response, e) ->
-                        writeProblem(
+                        ProblemJson.write(
                             response,
                             HttpServletResponse.SC_UNAUTHORIZED,
                             "API_KEY_REQUIRED",
@@ -45,15 +46,9 @@ public class TenantSecurityConfiguration {
                         )
                     )
                     .accessDeniedHandler((request, response, e) ->
-                        writeProblem(response, HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN", "Access denied")
+                        ProblemJson.write(response, HttpServletResponse.SC_FORBIDDEN, "FORBIDDEN", "Access denied")
                     )
             );
         return http.build();
-    }
-
-    private static void writeProblem(HttpServletResponse response, int status, String code, String detail) throws java.io.IOException {
-        response.setStatus(status);
-        response.setContentType("application/problem+json");
-        response.getWriter().write("{\"status\":" + status + ",\"code\":\"" + code + "\",\"detail\":\"" + detail + "\"}");
     }
 }

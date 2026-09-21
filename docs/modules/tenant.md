@@ -85,6 +85,12 @@ POST /api/extended/tenants/{id}/onboarding/screen           (staff, ROLE_ADMIN)
 
 Manual resolution (`.../onboarding/approve` and `.../onboarding/reject`, body `{"reason": "..."}`) applies only to `PENDING_REVIEW` + `MANUAL_REVIEW`. A rejected tenant (including a sanctions rejection) cannot be approved by hand.
 
+Interleavings (all covered by `OnboardingInterleavingIT`, which holds a screening open between its two transactions):
+
+- If the tenant leaves `PENDING_REVIEW` while its screening is in flight (for example staff suspend it), the result is **discarded** (409 `TENANT_STATUS_CHANGED`, `kycStatus` back to `NOT_STARTED`); an auto-approval never overrides a suspension.
+- If the process dies between the two transactions, `kycStatus` stays `PENDING` and retries fail with `KYC_IN_PROGRESS`. Staff recover with `POST /tenants/{id}/onboarding/reset` (body `{"reason"}`); if a screening is in fact still running, its result is discarded (`KYC_STATE_CHANGED`).
+- A tenant suspended **before** its first activation can only be closed: it cannot be screened (not `PENDING_REVIEW`) and cannot be reinstated (needs `kycStatus == APPROVED`). The spec has no `SUSPENDED -> PENDING_REVIEW` edge; this is a consequence of following the spec's transitions.
+
 ### How the score is computed
 
 The spec gives the bands but not the number, so the score is our own, vendor-independent calculation over discrete findings (`KycSignal`), summed and capped at 100. Weights are configuration (`payment-gateway.tenant.kyc.weights.*`); the defaults below are a proposal to be tuned with compliance:
@@ -148,14 +154,14 @@ A second `SecurityFilterChain` (highest precedence, matcher `/api/v1/**`) authen
 
 | Situation | Response |
 | --- | --- |
-| No `Authorization` header | 401 `API_KEY_REQUIRED` |
-| Malformed, unknown, revoked, inactive or grace-expired key | 401 `INVALID_API_KEY` (same body for all, so nothing is revealed about which) |
+| No `Authorization` header | 401 `API_KEY_REQUIRED` (with `WWW-Authenticate: Bearer`) |
+| Malformed, unknown, revoked, inactive or grace-expired key | 401 `INVALID_API_KEY` (same body for all, so nothing is revealed about which; with `WWW-Authenticate: Bearer`) |
 | Valid key, tenant may not process requests | 403 `TENANT_NOT_VERIFIED` / `TENANT_SUSPENDED` / `TENANT_REJECTED` / `TENANT_CLOSED` |
 | Valid key, tenant allowed | request proceeds; principal = `ApiKeyPrincipal(apiKeyId, tenantId, environment)` |
 
 `GET /api/v1/whoami` returns the tenant, key and environment behind a key. `/api/v1/public/**` needs no credentials.
 
-Merchant keys are looked up in the database on every request (no cache): revocation is therefore immediate, and the stack has no Redis (the spec's Redis cache is a Chunk 4/11 concern). If a per-request cache is added later it must be evicted on revoke.
+Merchant keys are looked up in the database on every request: revocation and suspension are therefore immediate. Authentication reads a single **projection query** (`ApiKeyAuthRow`: key flags plus the tenant's status), and `TenantAccessGuard` reads the status with a column query. Neither goes through the Hibernate second-level cache, which is per node (Caffeine, 1h TTL) and would let one node miss a suspension or revocation made on another. The stack has no Redis (the spec's Redis cache is a Chunk 4/11 concern); if a per-request cache is added later it must be evicted on revoke and status change.
 
 ## Custom domain and locale (spec §5.2)
 
@@ -169,6 +175,7 @@ Locale: `Accept-Language` is matched against the domain's `supportedLocales` (co
 | --- | --- |
 | `POST /tenants/{id}/onboarding/screen` | run KYC screening and apply the outcome |
 | `POST /tenants/{id}/onboarding/approve` / `reject` | manual review decision, body `{"reason"}` |
+| `POST /tenants/{id}/onboarding/reset` | recover a screening stuck in `PENDING`, body `{"reason"}` |
 | `POST /tenants/{id}/status` | guarded status transition, body `{"targetStatus","reason"}` |
 | `POST /tenants/{id}/api-keys` | issue the first key, body `{"environment"}` (returns the secret once) |
 | `POST /tenants/{id}/api-keys/rotate` | rotate, body `{"environment","gracePeriodHours"?}` |
@@ -185,7 +192,9 @@ Errors are RFC 9457 problem responses carrying a stable `code`.
 | `payment-gateway.tenant.api-keys.min-grace-period` / `max-grace-period` | `1h` / `48h` | |
 | `payment-gateway.tenant.api-keys.expiry-sweep-interval` | `PT1M` | ISO-8601 |
 | `payment-gateway.tenant.kyc.provider` | `stub` | refused under `prod` |
-| `payment-gateway.tenant.kyc.weights.*` | see table above | |
+| `payment-gateway.tenant.kyc.weights.*` | see table above | each must be 21-100 or the application refuses to start (a weight of 20 or less could auto-approve a finding) |
+
+Startup guard (fails closed for named environments): if any profile is active and none of them is `dev` or `test*` (so `prod`, `staging`, ...), the application refuses to start with the development pepper, a pepper shorter than 32 characters, or `kyc.provider=stub`. **Trade-off:** a run with no active profile at all is treated as development, because JHipster builds always set one (`dev` or `prod`) and the generated Cucumber tests, which cannot be edited, run without any. A deployment that deliberately blanks `spring.profiles.active` would therefore bypass this guard; deployments must set `prod`.
 
 ## Decisions recorded (project owner, 2026-09-21)
 
@@ -198,8 +207,8 @@ Judgement calls made without a question (raise if you disagree): `TenantDomain.d
 
 ## Known gaps and hand-offs
 
-- **RBAC and tenant users (spec §3, `AppUser`, `ROLE_TENANT_ADMIN`/`FINANCE`/`DEVELOPER`/`SUPPORT`) are not in any chunk's deliverables** in `TASK_BREAKDOWN.md`, so they are not built here. The staff endpoints above use the generated JHipster `ROLE_ADMIN`. Raised with the project owner; Chunk 12's traceability matrix will list it as unowned until assigned.
-- Self-serve registration (`POST /api/v1/auth/register-tenant`) and automatic TEST-key issuance on registration are likewise not in Chunk 1's deliverables.
-- Public `pk_` keys (checkout SDK) are not stored yet; they arrive with the hosted-fields work in Chunk 10.
-- The generated `/api/api-keys` CRUD (staff only) can still create or edit key rows directly and exposes `keyHash`. It cannot be closed without editing generated code (and the generated integration tests exercise it), so it is recorded as a hardening item for Chunk 11.
-- Acceptance criterion "suspending a tenant blocks new transaction creation" is verified here at the guard and merchant-API level; the check against the real charge endpoint can only be made in Chunk 4, which must call `TenantAccessGuard` and add that test.
+- **The generated CRUD endpoints bypass every guard in this module (security issue, needs an owner decision).** The generated `SecurityConfiguration` protects `/api/**` with `authenticated()` only (not staff-only), and `/api/register` is open to anyone, so any self-registered `ROLE_USER` can call the generated `PUT`/`PATCH`/`DELETE` on `/api/corporate-tenants` (setting `status`, `kycStatus`, `riskScore` directly, skipping the state machine and KYC guard) and on `/api/api-keys` (reactivating a revoked key, editing or deleting key rows, reading `keyHash`). The guarantees in this document (guarded transitions, revoked key rejected) hold for the hand-written endpoints and the merchant API only. It cannot be closed without editing generated code or breaking the generated integration tests, which call these endpoints with a plain `@WithMockUser` (`ROLE_USER`). No chunk in `TASK_BREAKDOWN.md` owns authorization hardening of the generated CRUD; see the owner decision recorded in `docs/validation/chunk-01.md`.
+- **Not owned by any chunk in `TASK_BREAKDOWN.md`** (verified by the validator; Chunk 12's matrix must list them as unowned until assigned): RBAC and tenant users (spec §3: `AppUser`, `ROLE_TENANT_ADMIN`/`FINANCE`/`DEVELOPER`/`SUPPORT`, MFA); self-serve registration (`POST /api/v1/auth/register-tenant`) and automatic TEST-key issuance on registration (§1.1); public `pk_` keys and the public `key_id` handle (§4.1; Chunk 10 mentions a hosted-fields endpoint but not `pk_` keys); status notification by email/webhook, filing rejections to the compliance dashboard and the 24-hour Tier-2 review queue (§2, Figure 2.2); the "designated settlement account" precondition for `ACTIVE` (§1.1); white-label branding, SSL/DNS verification state and CDN/CSP asset isolation (§5). The staff endpoints above use the generated JHipster `ROLE_ADMIN`.
+- The KYC evidence (which signals fired) is only logged; the tamper-evident record is the audit log (Chunk 9).
+- Acceptance criterion "suspending a tenant blocks new transaction creation" is verified here at the guard and merchant-API level; the check against the real charge endpoint can only be made in Chunk 4. Chunk 4 must call `TenantAccessGuard.assertCanTransact` (or sit behind the `/api/v1/**` chain), add that test, and handle the check-then-act race (a suspension committing between the status read and the charge insert lets one charge through unless the charge transaction re-checks under the tenant lock). This hand-off is not yet written into Chunk 4's entry in `TASK_BREAKDOWN.md`.
+- The generated Liquibase changelogs are regenerated in place (JHipster's default here), so a database that already applied an earlier version of a changelog fails checksum validation. Development databases are ephemeral: drop and recreate.

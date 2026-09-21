@@ -2,6 +2,7 @@ package io.paymentgateway.core.extended.tenant.service.apikey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -177,8 +178,14 @@ class ApiKeyRotationIT extends AbstractTenantIT {
 
     @Test
     void merchantEndpointsRejectMissingMalformedAndUnknownKeys() throws Exception {
-        mvc.perform(get("/api/v1/whoami")).andExpect(status().isUnauthorized()).andExpect(jsonPath("$.code").value("API_KEY_REQUIRED"));
-        mvc.perform(whoAmI("garbage")).andExpect(status().isUnauthorized()).andExpect(jsonPath("$.code").value("INVALID_API_KEY"));
+        mvc.perform(get("/api/v1/whoami"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.code").value("API_KEY_REQUIRED"))
+            .andExpect(header().string("WWW-Authenticate", org.hamcrest.Matchers.startsWith("Bearer")));
+        mvc.perform(whoAmI("garbage"))
+            .andExpect(status().isUnauthorized())
+            .andExpect(jsonPath("$.code").value("INVALID_API_KEY"))
+            .andExpect(header().string("WWW-Authenticate", org.hamcrest.Matchers.startsWith("Bearer")));
         mvc.perform(whoAmI("sk_live_" + "a".repeat(64)))
             .andExpect(status().isUnauthorized())
             .andExpect(jsonPath("$.code").value("INVALID_API_KEY"));

@@ -12,8 +12,13 @@ import org.springframework.data.repository.query.Param;
 
 /** Extra queries for {@link ApiKey}; see {@link ExtendedCorporateTenantRepository} for why it does not extend the generated one. */
 public interface ExtendedApiKeyRepository extends JpaRepository<ApiKey, Long> {
-    /** The single indexed lookup used on every authenticated request (keyHash is unique). */
-    Optional<ApiKey> findByKeyHash(String keyHash);
+    /** The single indexed lookup used on every authenticated request (keyHash is unique). Never served from a cache. */
+    @Query(
+        "select new io.paymentgateway.core.extended.tenant.repository.ApiKeyAuthRow(" +
+            "k.id, k.environment, k.isActive, k.revokedAt, k.graceExpiresAt, t.id, t.status) " +
+            "from ApiKey k join k.tenant t where k.keyHash = :keyHash"
+    )
+    Optional<ApiKeyAuthRow> findAuthRowByKeyHash(@Param("keyHash") String keyHash);
 
     @Query(
         "select k from ApiKey k where k.tenant.id = :tenantId and k.environment = :environment " +
