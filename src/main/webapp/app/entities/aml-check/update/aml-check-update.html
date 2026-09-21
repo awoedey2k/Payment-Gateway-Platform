@@ -1,0 +1,140 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-aml-check-heading" data-cy="AmlCheckCreateUpdateHeading">Create or edit a Aml Check</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let riskScoreRef = editForm.get('riskScore')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_riskScore">Risk Score</label>
+          <input type="number" class="form-control" name="riskScore" id="field_riskScore" data-cy="riskScore" formControlName="riskScore" />
+          @if (riskScoreRef.invalid && (riskScoreRef.dirty || riskScoreRef.touched)) {
+            <div>
+              @if (riskScoreRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!riskScoreRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let decisionRef = editForm.get('decision')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_decision">Decision</label>
+          <select class="form-select" name="decision" formControlName="decision" id="field_decision" data-cy="decision">
+            <option [ngValue]="null"></option>
+            @for (amlDecision of amlDecisionValues; track $index) {
+              <option [value]="amlDecision">
+                {{ { null: '', ALLOW: 'ALLOW', CHALLENGE: 'CHALLENGE', REJECT: 'REJECT', TIER_REVIEW: 'TIER_REVIEW' }[amlDecision] }}
+              </option>
+            }
+          </select>
+          @if (decisionRef.invalid && (decisionRef.dirty || decisionRef.touched)) {
+            <div>
+              @if (decisionRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_ruleTriggered">Rule Triggered</label>
+          <input
+            type="text"
+            class="form-control"
+            name="ruleTriggered"
+            id="field_ruleTriggered"
+            data-cy="ruleTriggered"
+            formControlName="ruleTriggered"
+          />
+        </div>
+
+        @let checkedAtRef = editForm.get('checkedAt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_checkedAt">Checked At</label>
+          <div class="d-flex">
+            <input
+              id="field_checkedAt"
+              data-cy="checkedAt"
+              type="datetime-local"
+              class="form-control"
+              name="checkedAt"
+              formControlName="checkedAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (checkedAtRef.invalid && (checkedAtRef.dirty || checkedAtRef.touched)) {
+            <div>
+              @if (checkedAtRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!checkedAtRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tenant">Tenant</label>
+          <select
+            class="form-select"
+            id="field_tenant"
+            data-cy="tenant"
+            name="tenant"
+            formControlName="tenant"
+            [compareWith]="compareCorporateTenant"
+          >
+            <option [ngValue]="null"></option>
+            @for (corporateTenantOption of corporateTenantsSharedCollection(); track $index) {
+              <option [ngValue]="corporateTenantOption">{{ corporateTenantOption.id }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_transaction">Transaction</label>
+          <select
+            class="form-select"
+            id="field_transaction"
+            data-cy="transaction"
+            name="transaction"
+            formControlName="transaction"
+            [compareWith]="compareTransaction"
+          >
+            <option [ngValue]="null"></option>
+            @for (transactionOption of transactionsSharedCollection(); track $index) {
+              <option [ngValue]="transactionOption">{{ transactionOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

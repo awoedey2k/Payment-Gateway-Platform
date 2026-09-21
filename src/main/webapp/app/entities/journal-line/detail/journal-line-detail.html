@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (journalLine(); as journalLineRef) {
+      <div>
+        <h2 data-cy="journalLineDetailsHeading"><span>Journal Line</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ journalLineRef.id }}</span>
+          </dd>
+          <dt><span>Debit Amount</span></dt>
+          <dd>
+            <span>{{ journalLineRef.debitAmount }}</span>
+          </dd>
+          <dt><span>Credit Amount</span></dt>
+          <dd>
+            <span>{{ journalLineRef.creditAmount }}</span>
+          </dd>
+          <dt><span>Account</span></dt>
+          <dd>
+            @if (journalLine()!.account) {
+              <div>
+                <a [routerLink]="['/ledger-account', journalLine()!.account?.id, 'view']">{{ journalLineRef.account?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Journal Entry</span></dt>
+          <dd>
+            @if (journalLine()!.journalEntry) {
+              <div>
+                <a [routerLink]="['/journal-entry', journalLine()!.journalEntry?.id, 'view']">{{ journalLineRef.journalEntry?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/journal-line', journalLineRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

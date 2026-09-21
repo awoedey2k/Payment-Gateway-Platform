@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Transaction.
+    -->
+    <changeSet id="20260921173147-1" author="jhipster">
+        <createTable tableName="transaction">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="reference" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_transaction__reference" />
+            </column>
+            <column name="tenant_reference" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="amount" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="fee_amount" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="net_amount" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="currency_code" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="country_code" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="payment_method_code" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="idempotency_key" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_transaction__idempotency_key" />
+            </column>
+            <column name="customer_email" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="customer_phone" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_at" type="${datetimeType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="completed_at" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="tenant_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="transaction" columnName="created_at" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="transaction" columnName="completed_at" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

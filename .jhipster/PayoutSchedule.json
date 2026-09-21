@@ -1,0 +1,39 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173154"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "frequencyMode",
+      "fieldType": "PayoutFrequency",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "DAILY,WEEKLY,MONTHLY,MANUAL"
+    },
+    {
+      "fieldName": "thresholdAmount",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "isActive",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "PayoutSchedule",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "corporateTenant",
+      "relationshipName": "tenant",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

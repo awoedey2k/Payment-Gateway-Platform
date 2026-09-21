@@ -1,0 +1,167 @@
+<div>
+  <h2 id="page-heading" data-cy="CountryPaymentMethodHeading">
+    <span>Country Payment Methods</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-country-payment-method"
+        [routerLink]="['/country-payment-method/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Country Payment Method</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (countryPaymentMethods().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Country Payment Methods found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="minTxnAmount">
+              <div class="d-flex">
+                <span>Min Txn Amount</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="maxTxnAmount">
+              <div class="d-flex">
+                <span>Max Txn Amount</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="supportsRecurring">
+              <div class="d-flex">
+                <span>Supports Recurring</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="supportsInstantRefund">
+              <div class="d-flex">
+                <span>Supports Instant Refund</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="isActive">
+              <div class="d-flex">
+                <span>Is Active</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="country.id">
+              <div class="d-flex">
+                <span>Country</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="paymentMethod.id">
+              <div class="d-flex">
+                <span>Payment Method</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (countryPaymentMethod of countryPaymentMethods(); track trackId(countryPaymentMethod)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/country-payment-method', countryPaymentMethod.id, 'view']">{{ countryPaymentMethod.id }}</a>
+              </td>
+              <td>{{ countryPaymentMethod.minTxnAmount }}</td>
+              <td>{{ countryPaymentMethod.maxTxnAmount }}</td>
+              <td>{{ countryPaymentMethod.supportsRecurring }}</td>
+              <td>{{ countryPaymentMethod.supportsInstantRefund }}</td>
+              <td>{{ countryPaymentMethod.isActive }}</td>
+              <td>
+                @if (countryPaymentMethod.country) {
+                  <div>
+                    <a [routerLink]="['/country', countryPaymentMethod.country.id, 'view']">{{ countryPaymentMethod.country.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (countryPaymentMethod.paymentMethod) {
+                  <div>
+                    <a [routerLink]="['/payment-method', countryPaymentMethod.paymentMethod.id, 'view']">{{
+                      countryPaymentMethod.paymentMethod.id
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/country-payment-method', countryPaymentMethod.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/country-payment-method', countryPaymentMethod.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(countryPaymentMethod)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (countryPaymentMethods().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

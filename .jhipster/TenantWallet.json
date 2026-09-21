@@ -1,0 +1,38 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173149"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "currencyCode",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "availableBalance",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "lockedBalance",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "TenantWallet",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "corporateTenant",
+      "relationshipName": "tenant",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

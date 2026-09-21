@@ -1,0 +1,187 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-routing-rule-heading" data-cy="RoutingRuleCreateUpdateHeading">Create or edit a Routing Rule</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let priorityRef = editForm.get('priority')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_priority">Priority</label>
+          <input type="number" class="form-control" name="priority" id="field_priority" data-cy="priority" formControlName="priority" />
+          @if (priorityRef.invalid && (priorityRef.dirty || priorityRef.touched)) {
+            <div>
+              @if (priorityRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!priorityRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let scopeRef = editForm.get('scope')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_scope">Scope</label>
+          <select class="form-select" name="scope" formControlName="scope" id="field_scope" data-cy="scope">
+            <option [ngValue]="null"></option>
+            @for (routingRuleScope of routingRuleScopeValues; track $index) {
+              <option [value]="routingRuleScope">
+                {{ { null: '', TENANT_CUSTOM: 'TENANT_CUSTOM', PLATFORM_GLOBAL: 'PLATFORM_GLOBAL' }[routingRuleScope] }}
+              </option>
+            }
+          </select>
+          @if (scopeRef.invalid && (scopeRef.dirty || scopeRef.touched)) {
+            <div>
+              @if (scopeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_countryCode">Country Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="countryCode"
+            id="field_countryCode"
+            data-cy="countryCode"
+            formControlName="countryCode"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_currencyCode">Currency Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="currencyCode"
+            id="field_currencyCode"
+            data-cy="currencyCode"
+            formControlName="currencyCode"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_cardBrand">Card Brand</label>
+          <input type="text" class="form-control" name="cardBrand" id="field_cardBrand" data-cy="cardBrand" formControlName="cardBrand" />
+        </div>
+
+        @let primaryAdapterRef = editForm.get('primaryAdapter')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_primaryAdapter">Primary Adapter</label>
+          <input
+            type="text"
+            class="form-control"
+            name="primaryAdapter"
+            id="field_primaryAdapter"
+            data-cy="primaryAdapter"
+            formControlName="primaryAdapter"
+          />
+          @if (primaryAdapterRef.invalid && (primaryAdapterRef.dirty || primaryAdapterRef.touched)) {
+            <div>
+              @if (primaryAdapterRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_fallbackAdapter">Fallback Adapter</label>
+          <input
+            type="text"
+            class="form-control"
+            name="fallbackAdapter"
+            id="field_fallbackAdapter"
+            data-cy="fallbackAdapter"
+            formControlName="fallbackAdapter"
+          />
+        </div>
+
+        @let maxRetriesRef = editForm.get('maxRetries')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_maxRetries">Max Retries</label>
+          <input
+            type="number"
+            class="form-control"
+            name="maxRetries"
+            id="field_maxRetries"
+            data-cy="maxRetries"
+            formControlName="maxRetries"
+          />
+          @if (maxRetriesRef.invalid && (maxRetriesRef.dirty || maxRetriesRef.touched)) {
+            <div>
+              @if (maxRetriesRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!maxRetriesRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let isActiveRef = editForm.get('isActive')!;
+        <div class="mb-3 form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            name="isActive"
+            id="field_isActive"
+            data-cy="isActive"
+            formControlName="isActive"
+          />
+          <label class="form-check-label" for="field_isActive">Is Active</label>
+          @if (isActiveRef.invalid && (isActiveRef.dirty || isActiveRef.touched)) {
+            <div>
+              @if (isActiveRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tenant">Tenant</label>
+          <select
+            class="form-select"
+            id="field_tenant"
+            data-cy="tenant"
+            name="tenant"
+            formControlName="tenant"
+            [compareWith]="compareCorporateTenant"
+          >
+            <option [ngValue]="null"></option>
+            @for (corporateTenantOption of corporateTenantsSharedCollection(); track $index) {
+              <option [ngValue]="corporateTenantOption">{{ corporateTenantOption.id }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

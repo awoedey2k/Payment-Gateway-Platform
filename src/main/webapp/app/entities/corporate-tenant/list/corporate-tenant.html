@@ -1,0 +1,225 @@
+<div>
+  <h2 id="page-heading" data-cy="CorporateTenantHeading">
+    <span>Corporate Tenants</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-corporate-tenant"
+        [routerLink]="['/corporate-tenant/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Corporate Tenant</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (corporateTenants().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Corporate Tenants found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="legalBusinessName">
+              <div class="d-flex">
+                <span>Legal Business Name</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="businessRegistrationNumber">
+              <div class="d-flex">
+                <span>Business Registration Number</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="taxIdentificationNumber">
+              <div class="d-flex">
+                <span>Tax Identification Number</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="operatingJurisdiction">
+              <div class="d-flex">
+                <span>Operating Jurisdiction</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="status">
+              <div class="d-flex">
+                <span>Status</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="kycStatus">
+              <div class="d-flex">
+                <span>Kyc Status</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="riskScore">
+              <div class="d-flex">
+                <span>Risk Score</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="createdAt">
+              <div class="d-flex">
+                <span>Created At</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="activatedAt">
+              <div class="d-flex">
+                <span>Activated At</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (corporateTenant of corporateTenants(); track trackId(corporateTenant)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/corporate-tenant', corporateTenant.id, 'view']">{{ corporateTenant.id }}</a>
+              </td>
+              <td>{{ corporateTenant.legalBusinessName }}</td>
+              <td>{{ corporateTenant.businessRegistrationNumber }}</td>
+              <td>{{ corporateTenant.taxIdentificationNumber }}</td>
+              <td>
+                {{
+                  { null: '', NG: 'NG', KE: 'KE', GH: 'GH', ZA: 'ZA', DE: 'DE', US: 'US', GB: 'GB' }[
+                    corporateTenant.operatingJurisdiction ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>
+                {{
+                  {
+                    null: '',
+                    PENDING_REVIEW: 'PENDING_REVIEW',
+                    ACTIVE: 'ACTIVE',
+                    SUSPENDED: 'SUSPENDED',
+                    REJECTED: 'REJECTED',
+                    CLOSED: 'CLOSED',
+                  }[corporateTenant.status ?? 'null']
+                }}
+              </td>
+              <td>
+                {{
+                  {
+                    null: '',
+                    NOT_STARTED: 'NOT_STARTED',
+                    PENDING: 'PENDING',
+                    APPROVED: 'APPROVED',
+                    REJECTED: 'REJECTED',
+                    MANUAL_REVIEW: 'MANUAL_REVIEW',
+                  }[corporateTenant.kycStatus ?? 'null']
+                }}
+              </td>
+              <td>{{ corporateTenant.riskScore }}</td>
+              <td>{{ corporateTenant.createdAt | formatMediumDatetime }}</td>
+              <td>{{ corporateTenant.activatedAt | formatMediumDatetime }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <button
+                    type="submit"
+                    [routerLink]="['/tenant-director']"
+                    [queryParams]="{ 'filter[tenantId.in]': corporateTenant.id }"
+                    class="btn btn-info btn-sm"
+                    data-cy="filterOtherEntityButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">Show Tenant Director</span>
+                  </button>
+                  <button
+                    type="submit"
+                    [routerLink]="['/api-key']"
+                    [queryParams]="{ 'filter[tenantId.in]': corporateTenant.id }"
+                    class="btn btn-info btn-sm"
+                    data-cy="filterOtherEntityButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">Show Api Key</span>
+                  </button>
+                  <button
+                    type="submit"
+                    [routerLink]="['/tenant-domain']"
+                    [queryParams]="{ 'filter[tenantId.in]': corporateTenant.id }"
+                    class="btn btn-info btn-sm"
+                    data-cy="filterOtherEntityButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">Show Tenant Domain</span>
+                  </button>
+                  <a
+                    [routerLink]="['/corporate-tenant', corporateTenant.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/corporate-tenant', corporateTenant.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(corporateTenant)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (corporateTenants().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

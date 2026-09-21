@@ -1,0 +1,50 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173138"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "fullName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "dateOfBirth",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "nationality",
+      "fieldType": "CountryCode",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "NG,KE,GH,ZA,DE,US,GB"
+    },
+    {
+      "fieldName": "identificationType",
+      "fieldType": "IdentificationType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "NATIONAL_ID,PASSPORT,DRIVERS_LICENSE"
+    },
+    {
+      "fieldName": "identificationNumber",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "TenantDirector",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "corporateTenant",
+      "relationshipName": "tenant",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

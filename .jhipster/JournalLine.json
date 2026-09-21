@@ -1,0 +1,38 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173152"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "debitAmount",
+      "fieldType": "BigDecimal"
+    },
+    {
+      "fieldName": "creditAmount",
+      "fieldType": "BigDecimal"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "JournalLine",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "ledgerAccount",
+      "relationshipName": "account",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    },
+    {
+      "otherEntityName": "journalEntry",
+      "relationshipName": "journalEntry",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

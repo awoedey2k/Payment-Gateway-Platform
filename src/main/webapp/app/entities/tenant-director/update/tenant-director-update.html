@@ -1,0 +1,164 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-tenant-director-heading" data-cy="TenantDirectorCreateUpdateHeading">Create or edit a Tenant Director</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let fullNameRef = editForm.get('fullName')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_fullName">Full Name</label>
+          <input type="text" class="form-control" name="fullName" id="field_fullName" data-cy="fullName" formControlName="fullName" />
+          @if (fullNameRef.invalid && (fullNameRef.dirty || fullNameRef.touched)) {
+            <div>
+              @if (fullNameRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let dateOfBirthRef = editForm.get('dateOfBirth')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_dateOfBirth">Date Of Birth</label>
+          <div class="input-group">
+            <input
+              id="field_dateOfBirth"
+              data-cy="dateOfBirth"
+              type="text"
+              class="form-control"
+              name="dateOfBirth"
+              ngbDatepicker
+              #dateOfBirthDp="ngbDatepicker"
+              formControlName="dateOfBirth"
+            />
+            <button type="button" class="btn btn-secondary" (click)="dateOfBirthDp.toggle()"><fa-icon icon="calendar-alt" /></button>
+          </div>
+          @if (dateOfBirthRef.invalid && (dateOfBirthRef.dirty || dateOfBirthRef.touched)) {
+            <div>
+              @if (dateOfBirthRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let nationalityRef = editForm.get('nationality')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_nationality">Nationality</label>
+          <select class="form-select" name="nationality" formControlName="nationality" id="field_nationality" data-cy="nationality">
+            <option [ngValue]="null"></option>
+            @for (countryCode of countryCodeValues; track $index) {
+              <option [value]="countryCode">
+                {{ { null: '', NG: 'NG', KE: 'KE', GH: 'GH', ZA: 'ZA', DE: 'DE', US: 'US', GB: 'GB' }[countryCode] }}
+              </option>
+            }
+          </select>
+          @if (nationalityRef.invalid && (nationalityRef.dirty || nationalityRef.touched)) {
+            <div>
+              @if (nationalityRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let identificationTypeRef = editForm.get('identificationType')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_identificationType">Identification Type</label>
+          <select
+            class="form-select"
+            name="identificationType"
+            formControlName="identificationType"
+            id="field_identificationType"
+            data-cy="identificationType"
+          >
+            <option [ngValue]="null"></option>
+            @for (identificationType of identificationTypeValues; track $index) {
+              <option [value]="identificationType">
+                {{ { null: '', NATIONAL_ID: 'NATIONAL_ID', PASSPORT: 'PASSPORT', DRIVERS_LICENSE: 'DRIVERS_LICENSE' }[identificationType] }}
+              </option>
+            }
+          </select>
+          @if (identificationTypeRef.invalid && (identificationTypeRef.dirty || identificationTypeRef.touched)) {
+            <div>
+              @if (identificationTypeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let identificationNumberRef = editForm.get('identificationNumber')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_identificationNumber">Identification Number</label>
+          <input
+            type="text"
+            class="form-control"
+            name="identificationNumber"
+            id="field_identificationNumber"
+            data-cy="identificationNumber"
+            formControlName="identificationNumber"
+          />
+          @if (identificationNumberRef.invalid && (identificationNumberRef.dirty || identificationNumberRef.touched)) {
+            <div>
+              @if (identificationNumberRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tenant">Tenant</label>
+          <select
+            class="form-select"
+            id="field_tenant"
+            data-cy="tenant"
+            name="tenant"
+            formControlName="tenant"
+            [compareWith]="compareCorporateTenant"
+          >
+            @if (editForm.get(['tenant'])!.value === null) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (corporateTenantOption of corporateTenantsSharedCollection(); track $index) {
+              <option [ngValue]="corporateTenantOption">{{ corporateTenantOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['tenant'])!.invalid && (editForm.get(['tenant'])!.dirty || editForm.get(['tenant'])!.touched)) {
+          <div>
+            @if (editForm.get(['tenant'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

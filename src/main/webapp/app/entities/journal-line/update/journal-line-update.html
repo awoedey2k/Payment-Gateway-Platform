@@ -1,0 +1,112 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-journal-line-heading" data-cy="JournalLineCreateUpdateHeading">Create or edit a Journal Line</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_debitAmount">Debit Amount</label>
+          <input
+            type="number"
+            class="form-control"
+            name="debitAmount"
+            id="field_debitAmount"
+            data-cy="debitAmount"
+            formControlName="debitAmount"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_creditAmount">Credit Amount</label>
+          <input
+            type="number"
+            class="form-control"
+            name="creditAmount"
+            id="field_creditAmount"
+            data-cy="creditAmount"
+            formControlName="creditAmount"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_account">Account</label>
+          <select
+            class="form-select"
+            id="field_account"
+            data-cy="account"
+            name="account"
+            formControlName="account"
+            [compareWith]="compareLedgerAccount"
+          >
+            @if (!editForm.get('account')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (ledgerAccountOption of ledgerAccountsSharedCollection(); track $index) {
+              <option [ngValue]="ledgerAccountOption">{{ ledgerAccountOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['account'])!.invalid && (editForm.get(['account'])!.dirty || editForm.get(['account'])!.touched)) {
+          <div>
+            @if (editForm.get(['account'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_journalEntry">Journal Entry</label>
+          <select
+            class="form-select"
+            id="field_journalEntry"
+            data-cy="journalEntry"
+            name="journalEntry"
+            formControlName="journalEntry"
+            [compareWith]="compareJournalEntry"
+          >
+            @if (editForm.get(['journalEntry'])!.value === null) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (journalEntryOption of journalEntriesSharedCollection(); track $index) {
+              <option [ngValue]="journalEntryOption">{{ journalEntryOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (
+          editForm.get(['journalEntry'])!.invalid && (editForm.get(['journalEntry'])!.dirty || editForm.get(['journalEntry'])!.touched)
+        ) {
+          <div>
+            @if (editForm.get(['journalEntry'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-refund-heading" data-cy="RefundCreateUpdateHeading">Create or edit a Refund</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let referenceRef = editForm.get('reference')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_reference">Reference</label>
+          <input type="text" class="form-control" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
+          @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
+            <div>
+              @if (referenceRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let amountRef = editForm.get('amount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_amount">Amount</label>
+          <input type="number" class="form-control" name="amount" id="field_amount" data-cy="amount" formControlName="amount" />
+          @if (amountRef.invalid && (amountRef.dirty || amountRef.touched)) {
+            <div>
+              @if (amountRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!amountRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let reasonRef = editForm.get('reason')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_reason">Reason</label>
+          <select class="form-select" name="reason" formControlName="reason" id="field_reason" data-cy="reason">
+            <option [ngValue]="null"></option>
+            @for (refundReason of refundReasonValues; track $index) {
+              <option [value]="refundReason">
+                {{
+                  { null: '', CUSTOMER_REQUEST_RETURN: 'CUSTOMER_REQUEST_RETURN', FRAUD: 'FRAUD', DUPLICATE: 'DUPLICATE', OTHER: 'OTHER' }[
+                    refundReason
+                  ]
+                }}
+              </option>
+            }
+          </select>
+          @if (reasonRef.invalid && (reasonRef.dirty || reasonRef.touched)) {
+            <div>
+              @if (reasonRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let statusRef = editForm.get('status')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_status">Status</label>
+          <select class="form-select" name="status" formControlName="status" id="field_status" data-cy="status">
+            <option [ngValue]="null"></option>
+            @for (refundStatus of refundStatusValues; track $index) {
+              <option [value]="refundStatus">
+                {{ { null: '', PENDING: 'PENDING', REFUNDED: 'REFUNDED', FAILED: 'FAILED' }[refundStatus] }}
+              </option>
+            }
+          </select>
+          @if (statusRef.invalid && (statusRef.dirty || statusRef.touched)) {
+            <div>
+              @if (statusRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let createdAtRef = editForm.get('createdAt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_createdAt">Created At</label>
+          <div class="d-flex">
+            <input
+              id="field_createdAt"
+              data-cy="createdAt"
+              type="datetime-local"
+              class="form-control"
+              name="createdAt"
+              formControlName="createdAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (createdAtRef.invalid && (createdAtRef.dirty || createdAtRef.touched)) {
+            <div>
+              @if (createdAtRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!createdAtRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_transaction">Transaction</label>
+          <select
+            class="form-select"
+            id="field_transaction"
+            data-cy="transaction"
+            name="transaction"
+            formControlName="transaction"
+            [compareWith]="compareTransaction"
+          >
+            @if (editForm.get(['transaction'])!.value === null) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (transactionOption of transactionsSharedCollection(); track $index) {
+              <option [ngValue]="transactionOption">{{ transactionOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['transaction'])!.invalid && (editForm.get(['transaction'])!.dirty || editForm.get(['transaction'])!.touched)) {
+          <div>
+            @if (editForm.get(['transaction'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

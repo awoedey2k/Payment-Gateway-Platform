@@ -1,0 +1,162 @@
+<div>
+  <h2 id="page-heading" data-cy="TenantDirectorHeading">
+    <span>Tenant Directors</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-tenant-director"
+        [routerLink]="['/tenant-director/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Tenant Director</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (tenantDirectors().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Tenant Directors found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fullName">
+              <div class="d-flex">
+                <span>Full Name</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dateOfBirth">
+              <div class="d-flex">
+                <span>Date Of Birth</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="nationality">
+              <div class="d-flex">
+                <span>Nationality</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="identificationType">
+              <div class="d-flex">
+                <span>Identification Type</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="identificationNumber">
+              <div class="d-flex">
+                <span>Identification Number</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tenant.id">
+              <div class="d-flex">
+                <span>Tenant</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tenantDirector of tenantDirectors(); track trackId(tenantDirector)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/tenant-director', tenantDirector.id, 'view']">{{ tenantDirector.id }}</a>
+              </td>
+              <td>{{ tenantDirector.fullName }}</td>
+              <td>{{ tenantDirector.dateOfBirth | formatMediumDate }}</td>
+              <td>
+                {{
+                  { null: '', NG: 'NG', KE: 'KE', GH: 'GH', ZA: 'ZA', DE: 'DE', US: 'US', GB: 'GB' }[tenantDirector.nationality ?? 'null']
+                }}
+              </td>
+              <td>
+                {{
+                  { null: '', NATIONAL_ID: 'NATIONAL_ID', PASSPORT: 'PASSPORT', DRIVERS_LICENSE: 'DRIVERS_LICENSE' }[
+                    tenantDirector.identificationType ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>{{ tenantDirector.identificationNumber }}</td>
+              <td>
+                @if (tenantDirector.tenant) {
+                  <div>
+                    <a [routerLink]="['/corporate-tenant', tenantDirector.tenant.id, 'view']">{{ tenantDirector.tenant.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/tenant-director', tenantDirector.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/tenant-director', tenantDirector.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(tenantDirector)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (tenantDirectors().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

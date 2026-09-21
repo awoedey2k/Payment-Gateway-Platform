@@ -1,0 +1,224 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-corporate-tenant-heading" data-cy="CorporateTenantCreateUpdateHeading">Create or edit a Corporate Tenant</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let legalBusinessNameRef = editForm.get('legalBusinessName')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_legalBusinessName">Legal Business Name</label>
+          <input
+            type="text"
+            class="form-control"
+            name="legalBusinessName"
+            id="field_legalBusinessName"
+            data-cy="legalBusinessName"
+            formControlName="legalBusinessName"
+          />
+          @if (legalBusinessNameRef.invalid && (legalBusinessNameRef.dirty || legalBusinessNameRef.touched)) {
+            <div>
+              @if (legalBusinessNameRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let businessRegistrationNumberRef = editForm.get('businessRegistrationNumber')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_businessRegistrationNumber">Business Registration Number</label>
+          <input
+            type="text"
+            class="form-control"
+            name="businessRegistrationNumber"
+            id="field_businessRegistrationNumber"
+            data-cy="businessRegistrationNumber"
+            formControlName="businessRegistrationNumber"
+          />
+          @if (businessRegistrationNumberRef.invalid && (businessRegistrationNumberRef.dirty || businessRegistrationNumberRef.touched)) {
+            <div>
+              @if (businessRegistrationNumberRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let taxIdentificationNumberRef = editForm.get('taxIdentificationNumber')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_taxIdentificationNumber">Tax Identification Number</label>
+          <input
+            type="text"
+            class="form-control"
+            name="taxIdentificationNumber"
+            id="field_taxIdentificationNumber"
+            data-cy="taxIdentificationNumber"
+            formControlName="taxIdentificationNumber"
+          />
+          @if (taxIdentificationNumberRef.invalid && (taxIdentificationNumberRef.dirty || taxIdentificationNumberRef.touched)) {
+            <div>
+              @if (taxIdentificationNumberRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let operatingJurisdictionRef = editForm.get('operatingJurisdiction')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_operatingJurisdiction">Operating Jurisdiction</label>
+          <select
+            class="form-select"
+            name="operatingJurisdiction"
+            formControlName="operatingJurisdiction"
+            id="field_operatingJurisdiction"
+            data-cy="operatingJurisdiction"
+          >
+            <option [ngValue]="null"></option>
+            @for (countryCode of countryCodeValues; track $index) {
+              <option [value]="countryCode">
+                {{ { null: '', NG: 'NG', KE: 'KE', GH: 'GH', ZA: 'ZA', DE: 'DE', US: 'US', GB: 'GB' }[countryCode] }}
+              </option>
+            }
+          </select>
+          @if (operatingJurisdictionRef.invalid && (operatingJurisdictionRef.dirty || operatingJurisdictionRef.touched)) {
+            <div>
+              @if (operatingJurisdictionRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let statusRef = editForm.get('status')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_status">Status</label>
+          <select class="form-select" name="status" formControlName="status" id="field_status" data-cy="status">
+            <option [ngValue]="null"></option>
+            @for (tenantStatus of tenantStatusValues; track $index) {
+              <option [value]="tenantStatus">
+                {{
+                  {
+                    null: '',
+                    PENDING_REVIEW: 'PENDING_REVIEW',
+                    ACTIVE: 'ACTIVE',
+                    SUSPENDED: 'SUSPENDED',
+                    REJECTED: 'REJECTED',
+                    CLOSED: 'CLOSED',
+                  }[tenantStatus]
+                }}
+              </option>
+            }
+          </select>
+          @if (statusRef.invalid && (statusRef.dirty || statusRef.touched)) {
+            <div>
+              @if (statusRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let kycStatusRef = editForm.get('kycStatus')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_kycStatus">Kyc Status</label>
+          <select class="form-select" name="kycStatus" formControlName="kycStatus" id="field_kycStatus" data-cy="kycStatus">
+            <option [ngValue]="null"></option>
+            @for (kycStatus of kycStatusValues; track $index) {
+              <option [value]="kycStatus">
+                {{
+                  {
+                    null: '',
+                    NOT_STARTED: 'NOT_STARTED',
+                    PENDING: 'PENDING',
+                    APPROVED: 'APPROVED',
+                    REJECTED: 'REJECTED',
+                    MANUAL_REVIEW: 'MANUAL_REVIEW',
+                  }[kycStatus]
+                }}
+              </option>
+            }
+          </select>
+          @if (kycStatusRef.invalid && (kycStatusRef.dirty || kycStatusRef.touched)) {
+            <div>
+              @if (kycStatusRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_riskScore">Risk Score</label>
+          <input type="number" class="form-control" name="riskScore" id="field_riskScore" data-cy="riskScore" formControlName="riskScore" />
+        </div>
+
+        @let createdAtRef = editForm.get('createdAt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_createdAt">Created At</label>
+          <div class="d-flex">
+            <input
+              id="field_createdAt"
+              data-cy="createdAt"
+              type="datetime-local"
+              class="form-control"
+              name="createdAt"
+              formControlName="createdAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (createdAtRef.invalid && (createdAtRef.dirty || createdAtRef.touched)) {
+            <div>
+              @if (createdAtRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!createdAtRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_activatedAt">Activated At</label>
+          <div class="d-flex">
+            <input
+              id="field_activatedAt"
+              data-cy="activatedAt"
+              type="datetime-local"
+              class="form-control"
+              name="activatedAt"
+              formControlName="activatedAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

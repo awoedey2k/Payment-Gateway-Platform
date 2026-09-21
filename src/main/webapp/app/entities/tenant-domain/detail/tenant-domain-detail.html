@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (tenantDomain(); as tenantDomainRef) {
+      <div>
+        <h2 data-cy="tenantDomainDetailsHeading"><span>Tenant Domain</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ tenantDomainRef.id }}</span>
+          </dd>
+          <dt><span>Custom Domain</span></dt>
+          <dd>
+            <span>{{ tenantDomainRef.customDomain }}</span>
+          </dd>
+          <dt><span>Supported Locales</span></dt>
+          <dd>
+            <span>{{ tenantDomainRef.supportedLocales }}</span>
+          </dd>
+          <dt><span>Is Verified</span></dt>
+          <dd>
+            <span>{{ tenantDomainRef.isVerified }}</span>
+          </dd>
+          <dt><span>Tenant</span></dt>
+          <dd>
+            @if (tenantDomain()!.tenant) {
+              <div>
+                <a [routerLink]="['/corporate-tenant', tenantDomain()!.tenant?.id, 'view']">{{ tenantDomainRef.tenant?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/tenant-domain', tenantDomainRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,164 @@
+<div>
+  <h2 id="page-heading" data-cy="AuditLogEntryHeading">
+    <span>Audit Log Entries</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-audit-log-entry"
+        [routerLink]="['/audit-log-entry/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Audit Log Entry</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (auditLogEntries().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Audit Log Entries found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="actorType">
+              <div class="d-flex">
+                <span>Actor Type</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="actorId">
+              <div class="d-flex">
+                <span>Actor Id</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="action">
+              <div class="d-flex">
+                <span>Action</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="entityType">
+              <div class="d-flex">
+                <span>Entity Type</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="entityId">
+              <div class="d-flex">
+                <span>Entity Id</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="previousHash">
+              <div class="d-flex">
+                <span>Previous Hash</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="entryHash">
+              <div class="d-flex">
+                <span>Entry Hash</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="recordedAt">
+              <div class="d-flex">
+                <span>Recorded At</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (auditLogEntry of auditLogEntries(); track trackId(auditLogEntry)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/audit-log-entry', auditLogEntry.id, 'view']">{{ auditLogEntry.id }}</a>
+              </td>
+              <td>
+                {{
+                  { null: '', SYSTEM: 'SYSTEM', STAFF_USER: 'STAFF_USER', TENANT_USER: 'TENANT_USER' }[auditLogEntry.actorType ?? 'null']
+                }}
+              </td>
+              <td>{{ auditLogEntry.actorId }}</td>
+              <td>{{ auditLogEntry.action }}</td>
+              <td>{{ auditLogEntry.entityType }}</td>
+              <td>{{ auditLogEntry.entityId }}</td>
+              <td>{{ auditLogEntry.previousHash }}</td>
+              <td>{{ auditLogEntry.entryHash }}</td>
+              <td>{{ auditLogEntry.recordedAt | formatMediumDatetime }}</td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/audit-log-entry', auditLogEntry.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/audit-log-entry', auditLogEntry.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(auditLogEntry)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (auditLogEntries().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

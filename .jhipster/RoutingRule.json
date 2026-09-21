@@ -1,0 +1,64 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173146"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "priority",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "scope",
+      "fieldType": "RoutingRuleScope",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "TENANT_CUSTOM,PLATFORM_GLOBAL"
+    },
+    {
+      "fieldName": "countryCode",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "currencyCode",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "cardBrand",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "primaryAdapter",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "fallbackAdapter",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "maxRetries",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "isActive",
+      "fieldType": "Boolean",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "RoutingRule",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "corporateTenant",
+      "relationshipName": "tenant",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

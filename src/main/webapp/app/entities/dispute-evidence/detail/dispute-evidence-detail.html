@@ -1,0 +1,74 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (disputeEvidence(); as disputeEvidenceRef) {
+      <div>
+        <h2 data-cy="disputeEvidenceDetailsHeading"><span>Dispute Evidence</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ disputeEvidenceRef.id }}</span>
+          </dd>
+          <dt><span>Evidence Type</span></dt>
+          <dd>
+            <span>{{
+              {
+                null: '',
+                PROOF_OF_DELIVERY: 'PROOF_OF_DELIVERY',
+                CUSTOMER_COMMUNICATION: 'CUSTOMER_COMMUNICATION',
+                REFUND_POLICY: 'REFUND_POLICY',
+                OTHER: 'OTHER',
+              }[disputeEvidenceRef.evidenceType ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>File Name</span></dt>
+          <dd>
+            <span>{{ disputeEvidenceRef.fileName }}</span>
+          </dd>
+          <dt><span>File Url</span></dt>
+          <dd>
+            <span>{{ disputeEvidenceRef.fileUrl }}</span>
+          </dd>
+          <dt><span>File Size Bytes</span></dt>
+          <dd>
+            <span>{{ disputeEvidenceRef.fileSizeBytes }}</span>
+          </dd>
+          <dt><span>Mime Type</span></dt>
+          <dd>
+            <span>{{ disputeEvidenceRef.mimeType }}</span>
+          </dd>
+          <dt><span>Sha 256 Checksum</span></dt>
+          <dd>
+            <span>{{ disputeEvidenceRef.sha256Checksum }}</span>
+          </dd>
+          <dt><span>Uploaded At</span></dt>
+          <dd>
+            <span>{{ disputeEvidenceRef.uploadedAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Dispute</span></dt>
+          <dd>
+            @if (disputeEvidence()!.dispute) {
+              <div>
+                <a [routerLink]="['/dispute', disputeEvidence()!.dispute?.id, 'view']">{{ disputeEvidenceRef.dispute?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/dispute-evidence', disputeEvidenceRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -74,7 +74,6 @@ relationship ManyToOne {
   PayoutSchedule{tenant required} to CorporateTenant
   SettlementBatch{tenant required} to CorporateTenant
   JournalLine{account required} to LedgerAccount
-  JournalLine{journalEntry required} to JournalEntry
 }
 
 relationship OneToMany {

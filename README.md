@@ -1,304 +1,106 @@
-# paymentgateway
+# Payment Gateway Platform
 
-This application was generated using JHipster 9.4.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v9.4.0](https://www.jhipster.tech/documentation-archive/v9.4.0).
+Multi-tenant payment gateway built on JHipster 9.4.0: Spring Boot 4.1 (Java 21), Angular 22 admin client, PostgreSQL, JWT auth for staff accounts, Maven.
 
-## Project Structure
+It launches as a **modular monolith** with a planned path to microservices. Why JHipster, and exactly where it helps versus where the code is hand-written, is recorded in [`docs/adr-jhipster.md`](docs/adr-jhipster.md). The requirements are in [`docs/technical-spec.md`](docs/technical-spec.md) and the implementation plan (chunks, branches, acceptance criteria) is in [`docs/TASK_BREAKDOWN.md`](docs/TASK_BREAKDOWN.md).
 
-Node is required for generation and recommended for development. `package.json` is always generated for a better development experience with prettier, commit hooks, scripts and so on.
+## Prerequisites
 
-In the project root, JHipster generates configuration files for tools like git, prettier, eslint, husky, and others that are well known and you can find references in the web.
+- **JDK 21** (JHipster 9 requires 21+)
+- **Docker** with Compose v2 — used for the local PostgreSQL and by the test suite (Testcontainers)
+- Node.js is **not** required: the Maven build downloads and uses its own copy (`./npmw` is the wrapper)
 
-`/src/*` structure follows default Java structure.
-
-- `.yo-rc.json` - Yeoman configuration file
-  JHipster configuration is stored in this file at `generator-jhipster` key. You may find `generator-jhipster-*` for specific blueprints configuration.
-- `.yo-resolve` (optional) - Yeoman conflict resolver
-  Allows to use a specific action when conflicts are found skipping prompts for files that matches a pattern. Each line should match `[pattern] [action]` with pattern been a [Minimatch](https://github.com/isaacs/minimatch#minimatch) pattern and action been one of skip (default if omitted) or force. Lines starting with `#` are considered comments and are ignored.
-- `.jhipster/*.json` - JHipster entity configuration files
-
-- `npmw` - wrapper to use locally installed npm.
-  JHipster installs Node and npm locally using the build tool by default. This wrapper makes sure npm is installed locally and uses it avoiding some differences different versions can cause. By using `./npmw` instead of the traditional `npm` you can configure a Node-less environment to develop or test your application.
-- `/src/main/docker` - Docker configurations for the application and services that the application depends on
-
-## Development
-
-### Doing API-First development using openapi-generator-cli
-
-[OpenAPI-Generator](https://openapi-generator.tech) is configured for this application. You can generate API code from the `src/main/resources/swagger/api.yml` definition file by running:
+## Run it locally
 
 ```bash
-./mvnw generate-sources
+./mvnw
 ```
 
-Then implements the generated delegate classes with `@Service` classes.
+This starts the backend with the `dev` profile. Spring Boot's Docker Compose integration starts PostgreSQL for you from [`src/main/docker/services.yml`](src/main/docker/services.yml) (database `paymentgateway` on `localhost:5432`), Liquibase creates the schema, and the built Angular client is served at <http://localhost:8080>.
 
-To edit the `api.yml` definition file, you can use a tool such as [Swagger-Editor](<>). Start a local instance of the swagger-editor using docker by running: `docker compose -f src/main/docker/swagger-editor.yml up -d`. The editor will then be reachable at [http://localhost:7742](http://localhost:7742).
-
-Refer to [Doing API-First development](https://www.jhipster.tech/documentation-archive/v9.4.0/doing-api-first-development/) for more details.
-The build system will install automatically the recommended version of Node and npm.
-
-We provide a wrapper to launch npm.
-You will only need to run this command when dependencies change in [package.json](package.json).
+To start PostgreSQL yourself instead:
 
 ```bash
-./npmw install
+docker compose -f src/main/docker/postgresql.yml up -d
 ```
 
-We use npm scripts and [Angular CLI](https://angular.dev/tools/cli) with esbuild as our build system.
+Sign in at <http://localhost:8080> with the dev accounts JHipster creates: `admin` / `admin` and `user` / `user`. **These are for local development only.** The entity screens are under the _Entities_ menu; the REST API docs are under _Administration → API_.
 
-Run the following commands in two separate terminals to create a blissful development experience where your browser
-auto-refreshes when files change on your hard drive.
+For client hot-reload while editing Angular code, run the backend as above and, in a second terminal:
 
 ```bash
-./npmw run backend:start
-./npmw run start
+./npmw start        # http://localhost:4200, proxied to the backend on :8080
 ```
 
-Npm is also used to manage CSS and JavaScript dependencies used in this application. You can upgrade dependencies by
-specifying a newer version in [package.json](package.json). You can also run `./npmw update` and `./npmw install` to manage dependencies.
-Add the `help` flag on any command to see how you can use it. For example, `./npmw help update`.
+No sample data is loaded (`skipFakeData` is on): random fake rows collide with the unique columns in this model and would put fictitious tenants and transactions in a payments database. Reference data is seeded deliberately (Chunk 2).
 
-The `./npmw run` command will list all the scripts available to run for this project.
-
-### PWA Support
-
-JHipster ships with PWA (Progressive Web App) support, and it's turned off by default. One of the main components of a PWA is a service worker.
-
-The service worker initialization code is disabled by default. To enable it, uncomment the following code in `src/main/webapp/app/app.config.ts`:
-
-```typescript
-ServiceWorkerModule.register('ngsw-worker.js', { enabled: false }),
-```
-
-### Managing dependencies
-
-For example, to add [Leaflet](https://leafletjs.com/) library as a runtime dependency of your application, you would run the following command:
+## Build and test
 
 ```bash
-./npmw install --save --save-exact leaflet
+./mvnw test      # unit tests + Cucumber
+./mvnw verify    # everything above plus the integration tests (*IT)
 ```
 
-To benefit from TypeScript type definitions from [DefinitelyTyped](https://definitelytyped.org/) repository in development, you would run the following command:
+Integration tests use Testcontainers, so Docker must be running. The generated suite is expected to pass unmodified.
+
+## Modules and where they live
+
+The six modules from the spec (§2.1) are modelled in numbered JDL files. **The JDL files are the single source of truth for the data model** — change the `.jdl` and regenerate, never hand-patch generated entity code.
+
+| Module                        | JDL file                              | Entities                                                                                                               | Hand-written logic arrives in                     |
+| ----------------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| App shell / options           | `00-app-config.jdl`, `90-options.jdl` | none (application config; DTO, service, pagination and filtering options for every entity)                             | Chunk 0                                           |
+| Tenant                        | `10-tenant.jdl`                       | `CorporateTenant`, `TenantDirector`, `ApiKey`, `TenantDomain`                                                          | Chunk 1 (RLS layer: Chunk 5)                      |
+| Catalog & FX                  | `20-catalog-fx.jdl`                   | `Currency`, `Country`, `PaymentMethod`, `CountryPaymentMethod`, `ForexRate`                                            | Chunk 2                                           |
+| Routing                       | `30-routing.jdl`                      | `RoutingRule`                                                                                                          | Chunk 3                                           |
+| Transaction                   | `40-transaction.jdl`                  | `Transaction`, `Refund`                                                                                                | Chunk 4                                           |
+| Settlement                    | `50-settlement.jdl`                   | `TenantWallet`, `LedgerAccount`, `JournalEntry`, `JournalLine`, `TenantFeeConfig`, `PayoutSchedule`, `SettlementBatch` | Chunks 6, 7                                       |
+| Audit & AML (and Integration) | `60-audit-aml.jdl`                    | `AmlCheck`, `AuditLogEntry`, `Dispute`, `DisputeEvidence`, `WebhookSubscription`, `WebhookDeliveryAttempt`             | Chunks 8 (disputes), 9 (AML/audit), 10 (webhooks) |
+
+That is 25 entities. Note that `Dispute`/`DisputeEvidence` sit in `60-audit-aml.jdl` although the ADR lists disputes under Settlement, and the webhook entities live there too; the table above follows the files as they are.
+
+JHipster generates by layer, under `io.paymentgateway.core`:
+
+| Package                                    | Contents                                                        |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| `domain`                                   | JPA entities                                                    |
+| `repository`                               | Spring Data repositories                                        |
+| `service`, `service.dto`, `service.mapper` | Services (`*Service`, `*QueryService`), DTOs, MapStruct mappers |
+| `web.rest`                                 | REST resources (`/api/<plural-entity-name>`)                    |
+| `security`, `config`                       | JWT security and Spring configuration                           |
+
+### The `extended` package rule
+
+**All hand-written implementation lives in `io.paymentgateway.core.extended`.** Generated classes (everything else under `io.paymentgateway.core`) are never modified, so the business logic we add is always identifiable and regeneration from the JDL can never overwrite it. If a generated repository, service or other class needs more behaviour, extend or wrap it inside `extended` and use that implementation. Data-model changes are the one exception: they go in the `jdl/` files and are regenerated.
+
+Generated: entity CRUD, REST, admin screens, Liquibase changelogs, JWT staff auth. Hand-written (later chunks): ledger, fees, routing, disputes, idempotency, and the row-level-security tenant layer. See the ADR table for the full split.
+
+Merchant API-key authentication (`sk_live_…`) is a separate, hand-written mechanism and is unrelated to the JHipster staff accounts above.
+
+## Regenerating from the JDL
+
+Run from the project root, with all JDL files in this order (`90-options.jdl` last):
 
 ```bash
-./npmw install --save-dev --save-exact @types/leaflet
+jhipster jdl jdl/00-app-config.jdl jdl/10-tenant.jdl jdl/20-catalog-fx.jdl jdl/30-routing.jdl \
+  jdl/40-transaction.jdl jdl/50-settlement.jdl jdl/60-audit-aml.jdl jdl/90-options.jdl \
+  --skip-git --skip-fake-data
 ```
 
-Then you would import the JS and CSS files specified in library's installation instructions so that [esbuild][] knows about them:
-Edit [src/main/webapp/app/app.config.ts](src/main/webapp/app/app.config.ts) file:
+`--skip-fake-data` is stored in `.yo-rc.json` by the first run; `skipFakeData` is not a JDL keyword, so keep the flag on the command line. The generator prints a `paginate option is deprecated` warning; it is harmless (`paginate` is still the only JDL spelling).
 
-```typescript
-import 'leaflet/dist/leaflet.js';
-```
+## Working from the JHipster Docker container
 
-Edit [src/main/webapp/content/scss/vendor.scss](src/main/webapp/content/scss/vendor.scss) file:
+If you run the generator from the `jhipster/jhipster:v9.4.0` container instead of a local install, mount the project directory and run `jhipster` from it. To build and test from inside that container:
 
-```typescript
-@import 'leaflet/dist/leaflet.css';
-```
+- Give it the Docker socket (`-v /var/run/docker.sock:/var/run/docker.sock`, plus `--group-add 0` on Docker Desktop) so Testcontainers works, and set `TESTCONTAINERS_HOST_OVERRIDE=host.docker.internal` on macOS/Windows.
+- The container has no `docker` CLI, so set `SPRING_DOCKER_COMPOSE_ENABLED=false` and start PostgreSQL with the `docker compose` command above; point the app at it with `SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/paymentgateway`.
+- If your Maven `settings.xml` lists private repositories that the container cannot reach, builds stall on connection timeouts. Pass a Central-only settings file with `./mvnw -s <file>`.
 
-Note: There are still a few other things remaining to do for Leaflet that we won't detail here.
+## Documentation
 
-For further instructions on how to develop with JHipster, have a look at [Using JHipster in development](https://www.jhipster.tech/development/).
-
-### Using Angular CLI
-
-You can also use [Angular CLI](https://angular.dev/tools/cli) to generate some custom client code.
-
-For example, the following command:
-
-```bash
-ng generate component my-component
-```
-
-will generate few files:
-
-```bash
-create src/main/webapp/app/my-component/my-component.html
-create src/main/webapp/app/my-component/my-component.ts
-update src/main/webapp/app/app.config.ts
-```
-
-## Building for production
-
-### Packaging as jar
-
-To build the final jar and optimize the paymentgateway application for production, run:
-
-```bash
-./mvnw -Pprod clean verify
-```
-
-This will concatenate and minify the client CSS and JavaScript files. It will also modify `index.html` so it references these new files.
-To ensure everything worked, run:
-
-```bash
-java -jar target/*.jar
-```
-
-Then navigate to [http://localhost:8080](http://localhost:8080) in your browser.
-
-Refer to [Using JHipster in production][] for more details.
-
-### Packaging as war
-
-To package your application as a war in order to deploy it to an application server, run:
-
-```bash
-./mvnw -Pprod,war clean verify
-```
-
-### JHipster Control Center
-
-JHipster Control Center can help you manage and control your application(s). You can start a local control center server (accessible on http://localhost:7419) with:
-
-```bash
-docker compose -f src/main/docker/jhipster-control-center.yml up
-```
-
-## Testing
-
-### Spring Boot tests
-
-To launch your application's tests, run:
-
-```bash
-./mvnw verify
-```
-
-### Client tests
-
-Unit tests are run by Vitest. They're located near components and can be run with:
-
-```bash
-./npmw test
-```
-
-#### E2E tests
-
-UI end-to-end tests are powered by [Cypress][]. They're located in [src/test/javascript/cypress/](src/test/javascript/cypress/)
-and can be run by starting Spring Boot in one terminal (`./npmw run app:start`) and running the tests (`./npmw run e2e`) in a second one.
-
-Before running Cypress tests, it's possible to specify user credentials by overriding the `CYPRESS_E2E_USERNAME` and `CYPRESS_E2E_PASSWORD` environment variables.
-
-```bash
-export CYPRESS_E2E_USERNAME="<your-username>"
-export CYPRESS_E2E_PASSWORD="<your-password>"
-```
-
-See Cypress documentation for setting OS [environment variables](https://docs.cypress.io/app/references/environment-variables#Setting) to learn more.
-
-#### Lighthouse audits
-
-You can execute automated [Lighthouse audits](https://developer.chrome.com/docs/lighthouse/overview) with [cypress-audit](https://github.com/mfrachet/cypress-audit) by running `./npmw run e2e:cypress:audits`.
-
-You should only run the audits when your application is packaged with the production profile.
-
-The Lighthouse report is created in `target/cypress/lhreport.html`.
-
-## Others
-
-### Code quality using Sonar
-
-Sonar is used to analyse code quality. You can start a local Sonar server (accessible on http://localhost:9001) with:
-
-```bash
-docker compose -f src/main/docker/sonar.yml up -d
-```
-
-Note: we have turned off forced authentication redirect for UI in [src/main/docker/sonar.yml](src/main/docker/sonar.yml) for out of the box experience while trying out SonarQube, for real use cases turn it back on.
-
-You can run a Sonar analysis with using the [sonar-scanner](https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner) or by using the maven plugin.
-
-Then, run a Sonar analysis:
-
-```bash
-./mvnw -Pprod clean verify sonar:sonar -Dsonar.login=admin -Dsonar.password=admin
-```
-
-If you need to re-run the Sonar phase, please be sure to specify at least the `initialize` phase since Sonar properties are loaded from the sonar-project.properties file.
-
-```bash
-./mvnw initialize sonar:sonar -Dsonar.login=admin -Dsonar.password=admin
-```
-
-Additionally, Instead of passing `sonar.password` and `sonar.login` as CLI arguments, these parameters can be configured from [sonar-project.properties](sonar-project.properties) as shown below:
-
-```bash
-sonar.login=admin
-sonar.password=admin
-```
-
-For more information, refer to the [Code quality page][].
-
-### Docker Compose support
-
-JHipster generates a number of Docker Compose configuration files in the [src/main/docker/](src/main/docker/) folder to launch required third party services.
-
-For example, to start required services in Docker containers, run:
-
-```bash
-docker compose -f src/main/docker/services.yml up -d
-```
-
-To stop and remove the containers, run:
-
-```bash
-docker compose -f src/main/docker/services.yml down
-```
-
-[Spring Docker Compose Integration](https://docs.spring.io/spring-boot/reference/features/dev-services.html) is enabled by default. It's possible to disable it in `application.yml`:
-
-```yaml
-spring:
-  ...
-  docker:
-    compose:
-      enabled: false
-```
-
-You can also fully dockerize your application and all the services that it depends on.
-To achieve this, first build a Docker image of your app by running:
-
-```bash
-npm run java:docker
-```
-
-Or build an arm64 Docker image when using an arm64 processor OS, i.e., Apple Silicon chips (M*), running:
-
-```bash
-npm run java:docker:arm64
-```
-
-Then run:
-
-```bash
-docker compose -f src/main/docker/app.yml up -d
-```
-
-For more information refer to [Docker and Docker-Compose](https://www.jhipster.tech/documentation-archive/v9.4.0/docker-compose/), this page also contains information on the Docker Compose sub-generator (`jhipster docker-compose`), which is able to generate Docker configurations for one or several JHipster applications.
-
-## Continuous Integration (optional)
-
-To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`), this will let you generate configuration files for a number of Continuous Integration systems. Consult the [Setting up Continuous Integration](https://www.jhipster.tech/documentation-archive/v9.4.0/setting-up-ci/) page for more information.
-
-## References
-
-- [JHipster Homepage and latest documentation](https://www.jhipster.tech/)
-- [JHipster 9.4.0 archive](https://www.jhipster.tech/documentation-archive/v9.4.0)
-- [Using JHipster in development](https://www.jhipster.tech/documentation-archive/v9.4.0/development/)
-- [Using Docker and Docker-Compose](https://www.jhipster.tech/documentation-archive/v9.4.0/docker-compose)
-- [Using JHipster in production](https://www.jhipster.tech/documentation-archive/v9.4.0/production/)
-- [Running tests page](https://www.jhipster.tech/documentation-archive/v9.4.0/running-tests/)
-- [Code quality page](https://www.jhipster.tech/documentation-archive/v9.4.0/code-quality/)
-- [Setting up Continuous Integration](https://www.jhipster.tech/documentation-archive/v9.4.0/setting-up-ci/)
-- [Node.js](https://nodejs.org/)
-- [NPM](https://www.npmjs.com/)
-- [OpenAPI-Generator](https://openapi-generator.tech)
-- [Swagger-Editor](https://editor.swagger.io)
-- [Doing API-First development](https://www.jhipster.tech/documentation-archive/v9.4.0/doing-api-first-development/)
-- [Jest](https://jestjs.io)
-- [Leaflet](https://leafletjs.com/)
-- [DefinitelyTyped](https://definitelytyped.org/)
-- [Angular CLI](https://angular.dev/tools/cli)
-- [Cypress](https://www.cypress.io/)
+- [`docs/adr-jhipster.md`](docs/adr-jhipster.md) — the JHipster adoption decision
+- [`docs/technical-spec.md`](docs/technical-spec.md) — the full technical specification
+- [`docs/TASK_BREAKDOWN.md`](docs/TASK_BREAKDOWN.md) — chunk-by-chunk plan and acceptance criteria
+- [`docs/CLAUDE_CODE_KICKOFF_PROMPT.md`](docs/CLAUDE_CODE_KICKOFF_PROMPT.md) — the workflow rules for implementation sessions
+- [`docs/JHIPSTER_GENERATED_README.md`](docs/JHIPSTER_GENERATED_README.md) — the README JHipster generated (tooling reference: Sonar, Cypress, Docker, CI, …)

@@ -1,0 +1,20 @@
+@if (tenantFeeConfig) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(tenantFeeConfig.id)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="tenantFeeConfigDeleteDialogHeading">Confirm delete operation</h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p id="jhi-delete-tenantFeeConfig-heading">Are you sure you want to delete Tenant Fee Config {{ tenantFeeConfig.id }}?</p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="cancel()"><fa-icon icon="ban" />&nbsp;<span>Cancel</span></button>
+
+      <button id="jhi-confirm-delete-tenantFeeConfig" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times" />&nbsp;<span>Delete</span>
+      </button>
+    </div>
+  </form>
+}

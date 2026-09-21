@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <!--
+        Added the constraints for entity TenantFeeConfig.
+    -->
+    <changeSet id="20260921173153-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="tenant_id"
+                                 baseTableName="tenant_fee_config"
+                                 constraintName="fk_tenant_fee_config__tenant_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="corporate_tenant"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="country_payment_method_id"
+                                 baseTableName="tenant_fee_config"
+                                 constraintName="fk_tenant_fee_config__country_payment_method_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="country_payment_method"
+                                 />
+    </changeSet>
+</databaseChangeLog>

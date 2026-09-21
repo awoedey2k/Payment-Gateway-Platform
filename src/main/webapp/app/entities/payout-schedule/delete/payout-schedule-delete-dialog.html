@@ -1,0 +1,20 @@
+@if (payoutSchedule) {
+  <form name="deleteForm" (ngSubmit)="confirmDelete(payoutSchedule.id)">
+    <div class="modal-header">
+      <h4 class="modal-title" data-cy="payoutScheduleDeleteDialogHeading">Confirm delete operation</h4>
+    </div>
+
+    <div class="modal-body">
+      <jhi-alert-error />
+      <p id="jhi-delete-payoutSchedule-heading">Are you sure you want to delete Payout Schedule {{ payoutSchedule.id }}?</p>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="cancel()"><fa-icon icon="ban" />&nbsp;<span>Cancel</span></button>
+
+      <button id="jhi-confirm-delete-payoutSchedule" data-cy="entityConfirmDeleteButton" type="submit" class="btn btn-danger">
+        <fa-icon icon="times" />&nbsp;<span>Delete</span>
+      </button>
+    </div>
+  </form>
+}

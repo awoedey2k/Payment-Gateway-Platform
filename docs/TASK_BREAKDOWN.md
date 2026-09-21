@@ -35,7 +35,7 @@ General rules that apply to every chunk, not repeated in each entry below:
 
 **Acceptance criteria**
 - [ ] App builds and starts locally against Postgres.
-- [ ] All 24 entities from the JDL are present with generated REST resources, services, and Liquibase changelogs.
+- [ ] All 25 entities from the JDL are present with generated REST resources, services, and Liquibase changelogs.
 - [ ] Generated Angular admin screens load for at least one entity per module, confirming the client build is sound.
 - [ ] README lets a new developer get the app running with no undocumented steps.
 
@@ -344,8 +344,9 @@ This is the project's completion gate, not a feature chunk. Nothing after this c
 | Routing | 3 |
 | Transaction | 4 |
 | (cross-cutting) Multi-tenancy | 5 |
-| Settlement | 6, 7 |
-| Audit & AML | 8, 9 |
+| Settlement (ledger, wallets, fees, payouts) | 6, 7 |
+| Settlement (disputes) | 8 |
+| Audit & AML | 9 |
 | Integration | 10 |
 | (cross-cutting) Operations | 11 |
 | (gate) Validation | 12 |

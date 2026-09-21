@@ -1,0 +1,50 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173148"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "reference",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "reason",
+      "fieldType": "RefundReason",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "CUSTOMER_REQUEST_RETURN,FRAUD,DUPLICATE,OTHER"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "RefundStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PENDING,REFUNDED,FAILED"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "Refund",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "transaction",
+      "relationshipName": "transaction",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

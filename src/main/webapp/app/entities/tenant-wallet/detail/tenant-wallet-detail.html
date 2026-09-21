@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (tenantWallet(); as tenantWalletRef) {
+      <div>
+        <h2 data-cy="tenantWalletDetailsHeading"><span>Tenant Wallet</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ tenantWalletRef.id }}</span>
+          </dd>
+          <dt><span>Currency Code</span></dt>
+          <dd>
+            <span>{{ tenantWalletRef.currencyCode }}</span>
+          </dd>
+          <dt><span>Available Balance</span></dt>
+          <dd>
+            <span>{{ tenantWalletRef.availableBalance }}</span>
+          </dd>
+          <dt><span>Locked Balance</span></dt>
+          <dd>
+            <span>{{ tenantWalletRef.lockedBalance }}</span>
+          </dd>
+          <dt><span>Tenant</span></dt>
+          <dd>
+            @if (tenantWallet()!.tenant) {
+              <div>
+                <a [routerLink]="['/corporate-tenant', tenantWallet()!.tenant?.id, 'view']">{{ tenantWalletRef.tenant?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/tenant-wallet', tenantWalletRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -40,6 +40,36 @@ public class CacheConfiguration {
             createCache(cm, io.paymentgateway.core.domain.User.class.getName());
             createCache(cm, io.paymentgateway.core.domain.Authority.class.getName());
             createCache(cm, io.paymentgateway.core.domain.User.class.getName() + ".authorities");
+            createCache(cm, io.paymentgateway.core.domain.CorporateTenant.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.CorporateTenant.class.getName() + ".tenantDirectors");
+            createCache(cm, io.paymentgateway.core.domain.CorporateTenant.class.getName() + ".apiKeys");
+            createCache(cm, io.paymentgateway.core.domain.CorporateTenant.class.getName() + ".tenantDomains");
+            createCache(cm, io.paymentgateway.core.domain.TenantDirector.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.ApiKey.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.TenantDomain.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.Currency.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.Country.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.PaymentMethod.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.CountryPaymentMethod.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.ForexRate.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.RoutingRule.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.Transaction.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.Transaction.class.getName() + ".refunds");
+            createCache(cm, io.paymentgateway.core.domain.Refund.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.TenantWallet.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.LedgerAccount.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.JournalEntry.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.JournalEntry.class.getName() + ".journalLines");
+            createCache(cm, io.paymentgateway.core.domain.JournalLine.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.TenantFeeConfig.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.PayoutSchedule.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.SettlementBatch.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.Dispute.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.DisputeEvidence.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.AmlCheck.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.AuditLogEntry.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.WebhookSubscription.class.getName());
+            createCache(cm, io.paymentgateway.core.domain.WebhookDeliveryAttempt.class.getName());
             // jhipster-needle-caffeine-add-entry
         };
     }

@@ -1,0 +1,121 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-payout-schedule-heading" data-cy="PayoutScheduleCreateUpdateHeading">Create or edit a Payout Schedule</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let frequencyModeRef = editForm.get('frequencyMode')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_frequencyMode">Frequency Mode</label>
+          <select class="form-select" name="frequencyMode" formControlName="frequencyMode" id="field_frequencyMode" data-cy="frequencyMode">
+            <option [ngValue]="null"></option>
+            @for (payoutFrequency of payoutFrequencyValues; track $index) {
+              <option [value]="payoutFrequency">
+                {{ { null: '', DAILY: 'DAILY', WEEKLY: 'WEEKLY', MONTHLY: 'MONTHLY', MANUAL: 'MANUAL' }[payoutFrequency] }}
+              </option>
+            }
+          </select>
+          @if (frequencyModeRef.invalid && (frequencyModeRef.dirty || frequencyModeRef.touched)) {
+            <div>
+              @if (frequencyModeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let thresholdAmountRef = editForm.get('thresholdAmount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_thresholdAmount">Threshold Amount</label>
+          <input
+            type="number"
+            class="form-control"
+            name="thresholdAmount"
+            id="field_thresholdAmount"
+            data-cy="thresholdAmount"
+            formControlName="thresholdAmount"
+          />
+          @if (thresholdAmountRef.invalid && (thresholdAmountRef.dirty || thresholdAmountRef.touched)) {
+            <div>
+              @if (thresholdAmountRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!thresholdAmountRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let isActiveRef = editForm.get('isActive')!;
+        <div class="mb-3 form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            name="isActive"
+            id="field_isActive"
+            data-cy="isActive"
+            formControlName="isActive"
+          />
+          <label class="form-check-label" for="field_isActive">Is Active</label>
+          @if (isActiveRef.invalid && (isActiveRef.dirty || isActiveRef.touched)) {
+            <div>
+              @if (isActiveRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tenant">Tenant</label>
+          <select
+            class="form-select"
+            id="field_tenant"
+            data-cy="tenant"
+            name="tenant"
+            formControlName="tenant"
+            [compareWith]="compareCorporateTenant"
+          >
+            @if (!editForm.get('tenant')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (corporateTenantOption of corporateTenantsSharedCollection(); track $index) {
+              <option [ngValue]="corporateTenantOption">{{ corporateTenantOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['tenant'])!.invalid && (editForm.get(['tenant'])!.dirty || editForm.get(['tenant'])!.touched)) {
+          <div>
+            @if (editForm.get(['tenant'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

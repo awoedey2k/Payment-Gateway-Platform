@@ -1,0 +1,13 @@
+export enum DisputeStatus {
+  OPEN = 'OPEN',
+
+  EVIDENCE_SUBMITTED = 'EVIDENCE_SUBMITTED',
+
+  UNDER_REVIEW = 'UNDER_REVIEW',
+
+  WON = 'WON',
+
+  LOST = 'LOST',
+
+  CLOSED = 'CLOSED',
+}

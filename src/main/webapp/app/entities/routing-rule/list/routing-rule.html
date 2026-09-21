@@ -1,0 +1,172 @@
+<div>
+  <h2 id="page-heading" data-cy="RoutingRuleHeading">
+    <span>Routing Rules</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-routing-rule"
+        [routerLink]="['/routing-rule/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Routing Rule</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (routingRules().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Routing Rules found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="priority">
+              <div class="d-flex">
+                <span>Priority</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="scope">
+              <div class="d-flex">
+                <span>Scope</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="countryCode">
+              <div class="d-flex">
+                <span>Country Code</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="currencyCode">
+              <div class="d-flex">
+                <span>Currency Code</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="cardBrand">
+              <div class="d-flex">
+                <span>Card Brand</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="primaryAdapter">
+              <div class="d-flex">
+                <span>Primary Adapter</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fallbackAdapter">
+              <div class="d-flex">
+                <span>Fallback Adapter</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="maxRetries">
+              <div class="d-flex">
+                <span>Max Retries</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="isActive">
+              <div class="d-flex">
+                <span>Is Active</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tenant.id">
+              <div class="d-flex">
+                <span>Tenant</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (routingRule of routingRules(); track trackId(routingRule)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/routing-rule', routingRule.id, 'view']">{{ routingRule.id }}</a>
+              </td>
+              <td>{{ routingRule.priority }}</td>
+              <td>{{ { null: '', TENANT_CUSTOM: 'TENANT_CUSTOM', PLATFORM_GLOBAL: 'PLATFORM_GLOBAL' }[routingRule.scope ?? 'null'] }}</td>
+              <td>{{ routingRule.countryCode }}</td>
+              <td>{{ routingRule.currencyCode }}</td>
+              <td>{{ routingRule.cardBrand }}</td>
+              <td>{{ routingRule.primaryAdapter }}</td>
+              <td>{{ routingRule.fallbackAdapter }}</td>
+              <td>{{ routingRule.maxRetries }}</td>
+              <td>{{ routingRule.isActive }}</td>
+              <td>
+                @if (routingRule.tenant) {
+                  <div>
+                    <a [routerLink]="['/corporate-tenant', routingRule.tenant.id, 'view']">{{ routingRule.tenant.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/routing-rule', routingRule.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/routing-rule', routingRule.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(routingRule)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (routingRules().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

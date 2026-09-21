@@ -1,0 +1,180 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-api-key-heading" data-cy="ApiKeyCreateUpdateHeading">Create or edit a Api Key</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let keyPrefixRef = editForm.get('keyPrefix')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_keyPrefix">Key Prefix</label>
+          <input type="text" class="form-control" name="keyPrefix" id="field_keyPrefix" data-cy="keyPrefix" formControlName="keyPrefix" />
+          @if (keyPrefixRef.invalid && (keyPrefixRef.dirty || keyPrefixRef.touched)) {
+            <div>
+              @if (keyPrefixRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let keyHashRef = editForm.get('keyHash')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_keyHash">Key Hash</label>
+          <input type="text" class="form-control" name="keyHash" id="field_keyHash" data-cy="keyHash" formControlName="keyHash" />
+          @if (keyHashRef.invalid && (keyHashRef.dirty || keyHashRef.touched)) {
+            <div>
+              @if (keyHashRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let environmentRef = editForm.get('environment')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_environment">Environment</label>
+          <select class="form-select" name="environment" formControlName="environment" id="field_environment" data-cy="environment">
+            <option [ngValue]="null"></option>
+            @for (apiEnvironment of apiEnvironmentValues; track $index) {
+              <option [value]="apiEnvironment">{{ { null: '', TEST: 'TEST', LIVE: 'LIVE' }[apiEnvironment] }}</option>
+            }
+          </select>
+          @if (environmentRef.invalid && (environmentRef.dirty || environmentRef.touched)) {
+            <div>
+              @if (environmentRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let isActiveRef = editForm.get('isActive')!;
+        <div class="mb-3 form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            name="isActive"
+            id="field_isActive"
+            data-cy="isActive"
+            formControlName="isActive"
+          />
+          <label class="form-check-label" for="field_isActive">Is Active</label>
+          @if (isActiveRef.invalid && (isActiveRef.dirty || isActiveRef.touched)) {
+            <div>
+              @if (isActiveRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let issuedAtRef = editForm.get('issuedAt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_issuedAt">Issued At</label>
+          <div class="d-flex">
+            <input
+              id="field_issuedAt"
+              data-cy="issuedAt"
+              type="datetime-local"
+              class="form-control"
+              name="issuedAt"
+              formControlName="issuedAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (issuedAtRef.invalid && (issuedAtRef.dirty || issuedAtRef.touched)) {
+            <div>
+              @if (issuedAtRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!issuedAtRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_revokedAt">Revoked At</label>
+          <div class="d-flex">
+            <input
+              id="field_revokedAt"
+              data-cy="revokedAt"
+              type="datetime-local"
+              class="form-control"
+              name="revokedAt"
+              formControlName="revokedAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_graceExpiresAt">Grace Expires At</label>
+          <div class="d-flex">
+            <input
+              id="field_graceExpiresAt"
+              data-cy="graceExpiresAt"
+              type="datetime-local"
+              class="form-control"
+              name="graceExpiresAt"
+              formControlName="graceExpiresAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tenant">Tenant</label>
+          <select
+            class="form-select"
+            id="field_tenant"
+            data-cy="tenant"
+            name="tenant"
+            formControlName="tenant"
+            [compareWith]="compareCorporateTenant"
+          >
+            @if (editForm.get(['tenant'])!.value === null) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (corporateTenantOption of corporateTenantsSharedCollection(); track $index) {
+              <option [ngValue]="corporateTenantOption">{{ corporateTenantOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['tenant'])!.invalid && (editForm.get(['tenant'])!.dirty || editForm.get(['tenant'])!.touched)) {
+          <div>
+            @if (editForm.get(['tenant'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

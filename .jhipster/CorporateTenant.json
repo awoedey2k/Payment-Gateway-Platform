@@ -1,0 +1,83 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173137"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "legalBusinessName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "businessRegistrationNumber",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "taxIdentificationNumber",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "operatingJurisdiction",
+      "fieldType": "CountryCode",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "NG,KE,GH,ZA,DE,US,GB"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "TenantStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PENDING_REVIEW,ACTIVE,SUSPENDED,REJECTED,CLOSED"
+    },
+    {
+      "fieldName": "kycStatus",
+      "fieldType": "KycStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "NOT_STARTED,PENDING,APPROVED,REJECTED,MANUAL_REVIEW"
+    },
+    {
+      "fieldName": "riskScore",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "createdAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "activatedAt",
+      "fieldType": "Instant"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "CorporateTenant",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "tenantDirector",
+      "otherEntityRelationshipName": "tenant",
+      "relationshipName": "tenantDirector",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "apiKey",
+      "otherEntityRelationshipName": "tenant",
+      "relationshipName": "apiKey",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "tenantDomain",
+      "otherEntityRelationshipName": "tenant",
+      "relationshipName": "tenantDomain",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

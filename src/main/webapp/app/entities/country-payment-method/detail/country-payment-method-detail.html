@@ -1,0 +1,68 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (countryPaymentMethod(); as countryPaymentMethodRef) {
+      <div>
+        <h2 data-cy="countryPaymentMethodDetailsHeading"><span>Country Payment Method</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ countryPaymentMethodRef.id }}</span>
+          </dd>
+          <dt><span>Min Txn Amount</span></dt>
+          <dd>
+            <span>{{ countryPaymentMethodRef.minTxnAmount }}</span>
+          </dd>
+          <dt><span>Max Txn Amount</span></dt>
+          <dd>
+            <span>{{ countryPaymentMethodRef.maxTxnAmount }}</span>
+          </dd>
+          <dt><span>Supports Recurring</span></dt>
+          <dd>
+            <span>{{ countryPaymentMethodRef.supportsRecurring }}</span>
+          </dd>
+          <dt><span>Supports Instant Refund</span></dt>
+          <dd>
+            <span>{{ countryPaymentMethodRef.supportsInstantRefund }}</span>
+          </dd>
+          <dt><span>Is Active</span></dt>
+          <dd>
+            <span>{{ countryPaymentMethodRef.isActive }}</span>
+          </dd>
+          <dt><span>Country</span></dt>
+          <dd>
+            @if (countryPaymentMethod()!.country) {
+              <div>
+                <a [routerLink]="['/country', countryPaymentMethod()!.country?.id, 'view']">{{ countryPaymentMethodRef.country?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Payment Method</span></dt>
+          <dd>
+            @if (countryPaymentMethod()!.paymentMethod) {
+              <div>
+                <a [routerLink]="['/payment-method', countryPaymentMethod()!.paymentMethod?.id, 'view']">{{
+                  countryPaymentMethodRef.paymentMethod?.id
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/country-payment-method', countryPaymentMethodRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

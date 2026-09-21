@@ -1,0 +1,161 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-forex-rate-heading" data-cy="ForexRateCreateUpdateHeading">Create or edit a Forex Rate</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let baseCurrencyRef = editForm.get('baseCurrency')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_baseCurrency">Base Currency</label>
+          <input
+            type="text"
+            class="form-control"
+            name="baseCurrency"
+            id="field_baseCurrency"
+            data-cy="baseCurrency"
+            formControlName="baseCurrency"
+          />
+          @if (baseCurrencyRef.invalid && (baseCurrencyRef.dirty || baseCurrencyRef.touched)) {
+            <div>
+              @if (baseCurrencyRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let quoteCurrencyRef = editForm.get('quoteCurrency')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_quoteCurrency">Quote Currency</label>
+          <input
+            type="text"
+            class="form-control"
+            name="quoteCurrency"
+            id="field_quoteCurrency"
+            data-cy="quoteCurrency"
+            formControlName="quoteCurrency"
+          />
+          @if (quoteCurrencyRef.invalid && (quoteCurrencyRef.dirty || quoteCurrencyRef.touched)) {
+            <div>
+              @if (quoteCurrencyRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let rateRef = editForm.get('rate')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_rate">Rate</label>
+          <input type="number" class="form-control" name="rate" id="field_rate" data-cy="rate" formControlName="rate" />
+          @if (rateRef.invalid && (rateRef.dirty || rateRef.touched)) {
+            <div>
+              @if (rateRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!rateRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let platformSpreadBpsRef = editForm.get('platformSpreadBps')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_platformSpreadBps">Platform Spread Bps</label>
+          <input
+            type="number"
+            class="form-control"
+            name="platformSpreadBps"
+            id="field_platformSpreadBps"
+            data-cy="platformSpreadBps"
+            formControlName="platformSpreadBps"
+          />
+          @if (platformSpreadBpsRef.invalid && (platformSpreadBpsRef.dirty || platformSpreadBpsRef.touched)) {
+            <div>
+              @if (platformSpreadBpsRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!platformSpreadBpsRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let lockedAtRef = editForm.get('lockedAt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_lockedAt">Locked At</label>
+          <div class="d-flex">
+            <input
+              id="field_lockedAt"
+              data-cy="lockedAt"
+              type="datetime-local"
+              class="form-control"
+              name="lockedAt"
+              formControlName="lockedAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (lockedAtRef.invalid && (lockedAtRef.dirty || lockedAtRef.touched)) {
+            <div>
+              @if (lockedAtRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!lockedAtRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        @let expiresAtRef = editForm.get('expiresAt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_expiresAt">Expires At</label>
+          <div class="d-flex">
+            <input
+              id="field_expiresAt"
+              data-cy="expiresAt"
+              type="datetime-local"
+              class="form-control"
+              name="expiresAt"
+              formControlName="expiresAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (expiresAtRef.invalid && (expiresAtRef.dirty || expiresAtRef.touched)) {
+            <div>
+              @if (expiresAtRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!expiresAtRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

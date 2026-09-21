@@ -1,0 +1,92 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (dispute(); as disputeRef) {
+      <div>
+        <h2 data-cy="disputeDetailsHeading"><span>Dispute</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ disputeRef.id }}</span>
+          </dd>
+          <dt><span>Case Reference</span></dt>
+          <dd>
+            <span>{{ disputeRef.caseReference }}</span>
+          </dd>
+          <dt><span>Amount</span></dt>
+          <dd>
+            <span>{{ disputeRef.amount }}</span>
+          </dd>
+          <dt><span>Currency Code</span></dt>
+          <dd>
+            <span>{{ disputeRef.currencyCode }}</span>
+          </dd>
+          <dt><span>Reason Code</span></dt>
+          <dd>
+            <span>{{ disputeRef.reasonCode }}</span>
+          </dd>
+          <dt><span>Reason Description</span></dt>
+          <dd>
+            <span>{{ disputeRef.reasonDescription }}</span>
+          </dd>
+          <dt><span>Status</span></dt>
+          <dd>
+            <span>{{
+              {
+                null: '',
+                OPEN: 'OPEN',
+                EVIDENCE_SUBMITTED: 'EVIDENCE_SUBMITTED',
+                UNDER_REVIEW: 'UNDER_REVIEW',
+                WON: 'WON',
+                LOST: 'LOST',
+                CLOSED: 'CLOSED',
+              }[disputeRef.status ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Due Date</span></dt>
+          <dd>
+            <span>{{ disputeRef.dueDate | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Evidence Submitted At</span></dt>
+          <dd>
+            <span>{{ disputeRef.evidenceSubmittedAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Resolved At</span></dt>
+          <dd>
+            <span>{{ disputeRef.resolvedAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Tenant</span></dt>
+          <dd>
+            @if (dispute()!.tenant) {
+              <div>
+                <a [routerLink]="['/corporate-tenant', dispute()!.tenant?.id, 'view']">{{ disputeRef.tenant?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Transaction</span></dt>
+          <dd>
+            @if (dispute()!.transaction) {
+              <div>
+                <a [routerLink]="['/transaction', dispute()!.transaction?.id, 'view']">{{ disputeRef.transaction?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/dispute', disputeRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

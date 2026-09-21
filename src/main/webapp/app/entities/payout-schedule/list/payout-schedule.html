@@ -1,0 +1,144 @@
+<div>
+  <h2 id="page-heading" data-cy="PayoutScheduleHeading">
+    <span>Payout Schedules</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-payout-schedule"
+        [routerLink]="['/payout-schedule/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Payout Schedule</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (payoutSchedules().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Payout Schedules found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="frequencyMode">
+              <div class="d-flex">
+                <span>Frequency Mode</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="thresholdAmount">
+              <div class="d-flex">
+                <span>Threshold Amount</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="isActive">
+              <div class="d-flex">
+                <span>Is Active</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tenant.id">
+              <div class="d-flex">
+                <span>Tenant</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (payoutSchedule of payoutSchedules(); track trackId(payoutSchedule)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/payout-schedule', payoutSchedule.id, 'view']">{{ payoutSchedule.id }}</a>
+              </td>
+              <td>
+                {{
+                  { null: '', DAILY: 'DAILY', WEEKLY: 'WEEKLY', MONTHLY: 'MONTHLY', MANUAL: 'MANUAL' }[
+                    payoutSchedule.frequencyMode ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>{{ payoutSchedule.thresholdAmount }}</td>
+              <td>{{ payoutSchedule.isActive }}</td>
+              <td>
+                @if (payoutSchedule.tenant) {
+                  <div>
+                    <a [routerLink]="['/corporate-tenant', payoutSchedule.tenant.id, 'view']">{{ payoutSchedule.tenant.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/payout-schedule', payoutSchedule.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/payout-schedule', payoutSchedule.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(payoutSchedule)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (payoutSchedules().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

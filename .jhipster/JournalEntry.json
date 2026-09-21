@@ -1,0 +1,38 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173151"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "reference",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "postedAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "JournalEntry",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "journalLine",
+      "otherEntityRelationshipName": "journalEntry",
+      "relationshipName": "journalLine",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}
