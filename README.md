@@ -18,10 +18,11 @@ It launches as a **modular monolith** with a planned path to microservices. Why 
 
 This starts the backend with the `dev` profile. Spring Boot's Docker Compose integration starts PostgreSQL for you from [`src/main/docker/services.yml`](src/main/docker/services.yml) (database `paymentgateway` on `localhost:5432`), Liquibase creates the schema, and the built Angular client is served at <http://localhost:8080>.
 
-To start PostgreSQL yourself instead:
+The PostgreSQL container is left running after the app stops (`lifecycle-management: start-only`) and has no persistent volume, so its data lasts only until the container is removed. To start it yourself, or to stop and delete it and its data:
 
 ```bash
 docker compose -f src/main/docker/postgresql.yml up -d
+docker compose -f src/main/docker/postgresql.yml down
 ```
 
 Sign in at <http://localhost:8080> with the dev accounts JHipster creates: `admin` / `admin` and `user` / `user`. **These are for local development only.** The entity screens are under the _Entities_ menu; the REST API docs are under _Administration → API_.
@@ -42,6 +43,14 @@ No sample data is loaded (`skipFakeData` is on): random fake rows collide with t
 ```
 
 Integration tests use Testcontainers, so Docker must be running. The generated suite is expected to pass unmodified.
+
+`./mvnw test` and `./mvnw verify` do **not** run the Angular unit tests. Run those separately:
+
+```bash
+./npmw test      # Angular unit tests (Vitest)
+```
+
+Generated Cypress end-to-end specs live in `src/test/javascript/cypress`; see [`docs/JHIPSTER_GENERATED_README.md`](docs/JHIPSTER_GENERATED_README.md) for how to run them. JHipster emits `skip` in the specs for entities with required relationships (`dispute`, `dispute-evidence`, `refund`, `tenant-fee-config`, `webhook-delivery-attempt`); those are generator output and are not edited.
 
 ## Modules and where they live
 
