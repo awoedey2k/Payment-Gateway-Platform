@@ -25,7 +25,7 @@ docker compose -f src/main/docker/postgresql.yml up -d
 docker compose -f src/main/docker/postgresql.yml down
 ```
 
-Sign in at <http://localhost:8080> with the dev accounts JHipster creates: `admin` / `admin` and `user` / `user`. **These are for local development only.** The entity screens are under the _Entities_ menu; the REST API docs are under _Administration → API_.
+Sign in at <http://localhost:8080> with the dev accounts JHipster creates: `admin` / `admin` and `user` / `user`. **These are for local development only.** The generated entity screens and `/api/<entity>` endpoints are restricted to `ROLE_ADMIN` outside test profiles (see `docs/modules/tenant.md`), so use `admin`; the `user` account cannot use them. The entity screens are under the _Entities_ menu; the REST API docs are under _Administration → API_.
 
 For client hot-reload while editing Angular code, run the backend as above and, in a second terminal:
 

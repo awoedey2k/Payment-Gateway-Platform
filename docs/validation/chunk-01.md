@@ -2,7 +2,7 @@
 
 Branch `chunk-01-tenant-identity-module` (based on `chunk-00-project-bootstrap`). Validator: `requirements-validator` definition in `.claude/agents/requirements-validator.md`, run through a general-purpose agent bound to that definition (the registered subagent type is not loaded in the session that created it).
 
-**Status: NOT SIGNED OFF.** Run 1 returned DO NOT SIGN OFF. The defects it found are fixed (below); the items that need project-owner decisions are open, and the validator has not yet re-run against the fixes.
+**Status: NOT SIGNED OFF.** Run 1 returned DO NOT SIGN OFF. The defects it found are fixed and the project owner has decided the open items (below); the validator has not yet re-run against the fixed branch. Update this file with run 2.
 
 ## Validator run 1 (branch tip `51208fa`)
 
@@ -34,10 +34,14 @@ Fixed in this branch, each with a test that fails without the fix (mutation-chec
 
 Also found while proving the concurrency tests (not by the validator): the generated test profile pins the Hikari pool to **one connection**, which made every concurrency test pass with no locking at all. `AbstractTenantIT` now overrides the pool, and the lock tests were mutation-checked (removing the tenant row lock fails 6 tests). A boundary test that failed ~57% of runs (23 of 40) because PostgreSQL rounds nanosecond timestamps was fixed by making the test clock microsecond-exact.
 
-## Open: needs a project-owner decision
+## Owner decisions (2026-09-21) and what was done
 
-- **Generated CRUD bypasses every guard (security).** `/api/**` is `authenticated()` only and `/api/register` is open, so any self-registered `ROLE_USER` can `PUT`/`PATCH` a tenant's `status`/`kycStatus`/`riskScore` or edit/reactivate API keys through the generated endpoints. Cannot be closed without editing generated code or the generated integration tests, and no chunk owns it. Options are presented to the owner.
-- **LIVE keys are issued on request after activation, not automatically at approval** (spec §2.2 says "provisioned automatically"; a once-shown secret needs a recipient). Documented; needs owner sign-off.
-- **`SUSPENDED -> CLOSED` edge added** (the spec diagram reaches `DEACTIVATED` only from `ACTIVE`). Documented; needs owner confirmation.
-- **Requirements owned by no chunk** (verified against `TASK_BREAKDOWN.md`): RBAC / tenant users / MFA (spec §3); self-serve registration and automatic TEST keys (§1.1); public `pk_` keys and `key_id` (§4.1); rejection notification, compliance-dashboard filing and the Tier-2 review queue (§2); the settlement-account precondition for `ACTIVE`; white-label branding and SSL/DNS state (§5). Chunk 12's matrix must list them as unowned until assigned.
-- **Chunk 4 hand-off**: the suspension criterion can only be finished in Chunk 4 (it must call `TenantAccessGuard` or sit behind the `/api/v1/**` chain, add the real test, and re-check status under the tenant lock to close the check-then-act race). Not yet written into Chunk 4's entry in `TASK_BREAKDOWN.md`.
+- **Generated CRUD bypass (security): admin-only chain outside test profiles.** Implemented as `GeneratedCrudLockdownConfiguration` (a second `SecurityFilterChain` requiring `ROLE_ADMIN` for every generated entity CRUD path); active in every real runtime, off only under `test*` profiles so the unmodified generated tests stay green. `GeneratedCrudLockdownIT` (real signed JWTs) proves a plain user gets 403 on tenant/API-key/other-module CRUD while an admin still works; mutation-checked (with the chain off, a plain user got 200 on the same calls).
+- **LIVE keys on request after activation** (instead of automatic at approval): accepted as a deliberate deviation from spec §2.2.
+- **`SUSPENDED -> CLOSED` kept** as an extension of the spec diagram.
+- **Unowned requirements assigned** (see the amendment at the top of `TASK_BREAKDOWN.md`): new **Chunk 1b** (`chunk-01b-tenant-users-rbac`: tenant users, RBAC, MFA, self-serve registration, automatic TEST keys); Chunk 4 (tenant enforcement on charge endpoints incl. the race re-check and the suspended-tenant test); Chunk 7 (settlement-account precondition); Chunk 9 (KYC evidence in the audit log, compliance filing, Tier-2 review queue); Chunk 10 (notifications, `pk_` keys and `key_id`, white-label).
+
+## Remaining open
+
+- Acceptance criterion 3 (suspension blocks transaction creation, cross-checked against Chunk 4) stays CANNOT VERIFY until Chunk 4; the hand-off is now written into Chunk 4's deliverables, tests and acceptance criteria.
+- Validator run 2 against the fixed branch.
