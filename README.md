@@ -82,6 +82,21 @@ JHipster generates by layer, under `io.paymentgateway.core`:
 
 **All hand-written implementation lives in `io.paymentgateway.core.extended`.** Generated classes (everything else under `io.paymentgateway.core`) are never modified, so the business logic we add is always identifiable and regeneration from the JDL can never overwrite it. If a generated repository, service or other class needs more behaviour, extend or wrap it inside `extended` and use that implementation. Data-model changes are the one exception: they go in the `jdl/` files and are regenerated.
 
+Inside `extended`, code is organised **per module, with layers inside each module** (decided 2026-09-21):
+
+```
+io.paymentgateway.core.extended
+├── tenant/        { service, repository, web, domain, ... }
+├── catalog/
+├── routing/
+├── transaction/
+├── settlement/
+├── audit/
+└── common/        cross-cutting code (e.g. row-level-security tenant context, shared utilities)
+```
+
+Each module uses `service`, `repository`, `web` (and, where needed, `domain`) sub-packages, and modules interact through their `service` packages, never through each other's repositories (spec §2.1: no cross-module table access).
+
 Generated: entity CRUD, REST, admin screens, Liquibase changelogs, JWT staff auth. Hand-written (later chunks): ledger, fees, routing, disputes, idempotency, and the row-level-security tenant layer. See the ADR table for the full split.
 
 Merchant API-key authentication (`sk_live_…`) is a separate, hand-written mechanism and is unrelated to the JHipster staff accounts above.
