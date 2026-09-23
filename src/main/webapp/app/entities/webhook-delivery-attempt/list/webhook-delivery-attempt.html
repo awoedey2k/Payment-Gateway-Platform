@@ -1,0 +1,160 @@
+<div>
+  <h2 id="page-heading" data-cy="WebhookDeliveryAttemptHeading">
+    <span>Webhook Delivery Attempts</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-webhook-delivery-attempt"
+        [routerLink]="['/webhook-delivery-attempt/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Webhook Delivery Attempt</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (webhookDeliveryAttempts().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Webhook Delivery Attempts found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="eventType">
+              <div class="d-flex">
+                <span>Event Type</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="status">
+              <div class="d-flex">
+                <span>Status</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="httpStatusCode">
+              <div class="d-flex">
+                <span>Http Status Code</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="attemptNumber">
+              <div class="d-flex">
+                <span>Attempt Number</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="attemptedAt">
+              <div class="d-flex">
+                <span>Attempted At</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="subscription.id">
+              <div class="d-flex">
+                <span>Subscription</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (webhookDeliveryAttempt of webhookDeliveryAttempts(); track trackId(webhookDeliveryAttempt)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/webhook-delivery-attempt', webhookDeliveryAttempt.id, 'view']">{{ webhookDeliveryAttempt.id }}</a>
+              </td>
+              <td>{{ webhookDeliveryAttempt.eventType }}</td>
+              <td>
+                {{
+                  { null: '', PENDING: 'PENDING', DELIVERED: 'DELIVERED', FAILED: 'FAILED', RETRYING: 'RETRYING' }[
+                    webhookDeliveryAttempt.status ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>{{ webhookDeliveryAttempt.httpStatusCode }}</td>
+              <td>{{ webhookDeliveryAttempt.attemptNumber }}</td>
+              <td>{{ webhookDeliveryAttempt.attemptedAt | formatMediumDatetime }}</td>
+              <td>
+                @if (webhookDeliveryAttempt.subscription) {
+                  <div>
+                    <a [routerLink]="['/webhook-subscription', webhookDeliveryAttempt.subscription.id, 'view']">{{
+                      webhookDeliveryAttempt.subscription.id
+                    }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/webhook-delivery-attempt', webhookDeliveryAttempt.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/webhook-delivery-attempt', webhookDeliveryAttempt.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(webhookDeliveryAttempt)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (webhookDeliveryAttempts().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

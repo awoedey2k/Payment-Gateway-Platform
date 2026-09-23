@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity CountryPaymentMethod.
+    -->
+    <changeSet id="20260921173144-1" author="jhipster">
+        <createTable tableName="country_payment_method">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="min_txn_amount" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="max_txn_amount" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="supports_recurring" type="boolean">
+                <constraints nullable="false" />
+            </column>
+            <column name="supports_instant_refund" type="boolean">
+                <constraints nullable="false" />
+            </column>
+            <column name="is_active" type="boolean">
+                <constraints nullable="false" />
+            </column>
+            <column name="country_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="payment_method_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

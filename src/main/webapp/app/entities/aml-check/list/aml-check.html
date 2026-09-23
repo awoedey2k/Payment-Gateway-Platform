@@ -1,0 +1,156 @@
+<div>
+  <h2 id="page-heading" data-cy="AmlCheckHeading">
+    <span>Aml Checks</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-aml-check"
+        [routerLink]="['/aml-check/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Aml Check</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (amlChecks().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Aml Checks found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="riskScore">
+              <div class="d-flex">
+                <span>Risk Score</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="decision">
+              <div class="d-flex">
+                <span>Decision</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="ruleTriggered">
+              <div class="d-flex">
+                <span>Rule Triggered</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="checkedAt">
+              <div class="d-flex">
+                <span>Checked At</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tenant.id">
+              <div class="d-flex">
+                <span>Tenant</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="transaction.id">
+              <div class="d-flex">
+                <span>Transaction</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (amlCheck of amlChecks(); track trackId(amlCheck)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/aml-check', amlCheck.id, 'view']">{{ amlCheck.id }}</a>
+              </td>
+              <td>{{ amlCheck.riskScore }}</td>
+              <td>
+                {{
+                  { null: '', ALLOW: 'ALLOW', CHALLENGE: 'CHALLENGE', REJECT: 'REJECT', TIER_REVIEW: 'TIER_REVIEW' }[
+                    amlCheck.decision ?? 'null'
+                  ]
+                }}
+              </td>
+              <td>{{ amlCheck.ruleTriggered }}</td>
+              <td>{{ amlCheck.checkedAt | formatMediumDatetime }}</td>
+              <td>
+                @if (amlCheck.tenant) {
+                  <div>
+                    <a [routerLink]="['/corporate-tenant', amlCheck.tenant.id, 'view']">{{ amlCheck.tenant.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (amlCheck.transaction) {
+                  <div>
+                    <a [routerLink]="['/transaction', amlCheck.transaction.id, 'view']">{{ amlCheck.transaction.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/aml-check', amlCheck.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/aml-check', amlCheck.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(amlCheck)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (amlChecks().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

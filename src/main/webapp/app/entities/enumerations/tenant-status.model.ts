@@ -1,0 +1,11 @@
+export enum TenantStatus {
+  PENDING_REVIEW = 'PENDING_REVIEW',
+
+  ACTIVE = 'ACTIVE',
+
+  SUSPENDED = 'SUSPENDED',
+
+  REJECTED = 'REJECTED',
+
+  CLOSED = 'CLOSED',
+}

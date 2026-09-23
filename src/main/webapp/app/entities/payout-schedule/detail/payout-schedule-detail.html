@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (payoutSchedule(); as payoutScheduleRef) {
+      <div>
+        <h2 data-cy="payoutScheduleDetailsHeading"><span>Payout Schedule</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ payoutScheduleRef.id }}</span>
+          </dd>
+          <dt><span>Frequency Mode</span></dt>
+          <dd>
+            <span>{{
+              { null: '', DAILY: 'DAILY', WEEKLY: 'WEEKLY', MONTHLY: 'MONTHLY', MANUAL: 'MANUAL' }[
+                payoutScheduleRef.frequencyMode ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span>Threshold Amount</span></dt>
+          <dd>
+            <span>{{ payoutScheduleRef.thresholdAmount }}</span>
+          </dd>
+          <dt><span>Is Active</span></dt>
+          <dd>
+            <span>{{ payoutScheduleRef.isActive }}</span>
+          </dd>
+          <dt><span>Tenant</span></dt>
+          <dd>
+            @if (payoutSchedule()!.tenant) {
+              <div>
+                <a [routerLink]="['/corporate-tenant', payoutSchedule()!.tenant?.id, 'view']">{{ payoutScheduleRef.tenant?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/payout-schedule', payoutScheduleRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

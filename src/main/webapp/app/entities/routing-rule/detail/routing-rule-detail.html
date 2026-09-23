@@ -1,0 +1,76 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (routingRule(); as routingRuleRef) {
+      <div>
+        <h2 data-cy="routingRuleDetailsHeading"><span>Routing Rule</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ routingRuleRef.id }}</span>
+          </dd>
+          <dt><span>Priority</span></dt>
+          <dd>
+            <span>{{ routingRuleRef.priority }}</span>
+          </dd>
+          <dt><span>Scope</span></dt>
+          <dd>
+            <span>{{
+              { null: '', TENANT_CUSTOM: 'TENANT_CUSTOM', PLATFORM_GLOBAL: 'PLATFORM_GLOBAL' }[routingRuleRef.scope ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Country Code</span></dt>
+          <dd>
+            <span>{{ routingRuleRef.countryCode }}</span>
+          </dd>
+          <dt><span>Currency Code</span></dt>
+          <dd>
+            <span>{{ routingRuleRef.currencyCode }}</span>
+          </dd>
+          <dt><span>Card Brand</span></dt>
+          <dd>
+            <span>{{ routingRuleRef.cardBrand }}</span>
+          </dd>
+          <dt><span>Primary Adapter</span></dt>
+          <dd>
+            <span>{{ routingRuleRef.primaryAdapter }}</span>
+          </dd>
+          <dt><span>Fallback Adapter</span></dt>
+          <dd>
+            <span>{{ routingRuleRef.fallbackAdapter }}</span>
+          </dd>
+          <dt><span>Max Retries</span></dt>
+          <dd>
+            <span>{{ routingRuleRef.maxRetries }}</span>
+          </dd>
+          <dt><span>Is Active</span></dt>
+          <dd>
+            <span>{{ routingRuleRef.isActive }}</span>
+          </dd>
+          <dt><span>Tenant</span></dt>
+          <dd>
+            @if (routingRule()!.tenant) {
+              <div>
+                <a [routerLink]="['/corporate-tenant', routingRule()!.tenant?.id, 'view']">{{ routingRuleRef.tenant?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/routing-rule', routingRuleRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,59 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173157"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "evidenceType",
+      "fieldType": "DisputeEvidenceType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PROOF_OF_DELIVERY,CUSTOMER_COMMUNICATION,REFUND_POLICY,OTHER"
+    },
+    {
+      "fieldName": "fileName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "fileUrl",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "fileSizeBytes",
+      "fieldType": "Long",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "mimeType",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "sha256Checksum",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "uploadedAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "DisputeEvidence",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "dispute",
+      "relationshipName": "dispute",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

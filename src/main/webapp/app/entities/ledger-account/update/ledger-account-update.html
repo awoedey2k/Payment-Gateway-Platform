@@ -1,0 +1,94 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-ledger-account-heading" data-cy="LedgerAccountCreateUpdateHeading">Create or edit a Ledger Account</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let accountCodeRef = editForm.get('accountCode')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_accountCode">Account Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="accountCode"
+            id="field_accountCode"
+            data-cy="accountCode"
+            formControlName="accountCode"
+          />
+          @if (accountCodeRef.invalid && (accountCodeRef.dirty || accountCodeRef.touched)) {
+            <div>
+              @if (accountCodeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let accountTypeRef = editForm.get('accountType')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_accountType">Account Type</label>
+          <select class="form-select" name="accountType" formControlName="accountType" id="field_accountType" data-cy="accountType">
+            <option [ngValue]="null"></option>
+            @for (ledgerAccountType of ledgerAccountTypeValues; track $index) {
+              <option [value]="ledgerAccountType">
+                {{ { null: '', ASSET: 'ASSET', LIABILITY: 'LIABILITY', REVENUE: 'REVENUE', EXPENSE: 'EXPENSE' }[ledgerAccountType] }}
+              </option>
+            }
+          </select>
+          @if (accountTypeRef.invalid && (accountTypeRef.dirty || accountTypeRef.touched)) {
+            <div>
+              @if (accountTypeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let currencyCodeRef = editForm.get('currencyCode')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_currencyCode">Currency Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="currencyCode"
+            id="field_currencyCode"
+            data-cy="currencyCode"
+            formControlName="currencyCode"
+          />
+          @if (currencyCodeRef.invalid && (currencyCodeRef.dirty || currencyCodeRef.touched)) {
+            <div>
+              @if (currencyCodeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

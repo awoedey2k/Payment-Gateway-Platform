@@ -1,0 +1,301 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-transaction-heading" data-cy="TransactionCreateUpdateHeading">Create or edit a Transaction</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let referenceRef = editForm.get('reference')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_reference">Reference</label>
+          <input type="text" class="form-control" name="reference" id="field_reference" data-cy="reference" formControlName="reference" />
+          @if (referenceRef.invalid && (referenceRef.dirty || referenceRef.touched)) {
+            <div>
+              @if (referenceRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tenantReference">Tenant Reference</label>
+          <input
+            type="text"
+            class="form-control"
+            name="tenantReference"
+            id="field_tenantReference"
+            data-cy="tenantReference"
+            formControlName="tenantReference"
+          />
+        </div>
+
+        @let statusRef = editForm.get('status')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_status">Status</label>
+          <select class="form-select" name="status" formControlName="status" id="field_status" data-cy="status">
+            <option [ngValue]="null"></option>
+            @for (transactionStatus of transactionStatusValues; track $index) {
+              <option [value]="transactionStatus">
+                {{
+                  {
+                    null: '',
+                    PENDING: 'PENDING',
+                    AUTHORIZED: 'AUTHORIZED',
+                    SUCCESSFUL: 'SUCCESSFUL',
+                    FAILED: 'FAILED',
+                    REVERSED: 'REVERSED',
+                  }[transactionStatus]
+                }}
+              </option>
+            }
+          </select>
+          @if (statusRef.invalid && (statusRef.dirty || statusRef.touched)) {
+            <div>
+              @if (statusRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let amountRef = editForm.get('amount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_amount">Amount</label>
+          <input type="number" class="form-control" name="amount" id="field_amount" data-cy="amount" formControlName="amount" />
+          @if (amountRef.invalid && (amountRef.dirty || amountRef.touched)) {
+            <div>
+              @if (amountRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!amountRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let feeAmountRef = editForm.get('feeAmount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_feeAmount">Fee Amount</label>
+          <input type="number" class="form-control" name="feeAmount" id="field_feeAmount" data-cy="feeAmount" formControlName="feeAmount" />
+          @if (feeAmountRef.invalid && (feeAmountRef.dirty || feeAmountRef.touched)) {
+            <div>
+              @if (feeAmountRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!feeAmountRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let netAmountRef = editForm.get('netAmount')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_netAmount">Net Amount</label>
+          <input type="number" class="form-control" name="netAmount" id="field_netAmount" data-cy="netAmount" formControlName="netAmount" />
+          @if (netAmountRef.invalid && (netAmountRef.dirty || netAmountRef.touched)) {
+            <div>
+              @if (netAmountRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!netAmountRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let currencyCodeRef = editForm.get('currencyCode')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_currencyCode">Currency Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="currencyCode"
+            id="field_currencyCode"
+            data-cy="currencyCode"
+            formControlName="currencyCode"
+          />
+          @if (currencyCodeRef.invalid && (currencyCodeRef.dirty || currencyCodeRef.touched)) {
+            <div>
+              @if (currencyCodeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let countryCodeRef = editForm.get('countryCode')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_countryCode">Country Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="countryCode"
+            id="field_countryCode"
+            data-cy="countryCode"
+            formControlName="countryCode"
+          />
+          @if (countryCodeRef.invalid && (countryCodeRef.dirty || countryCodeRef.touched)) {
+            <div>
+              @if (countryCodeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let paymentMethodCodeRef = editForm.get('paymentMethodCode')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_paymentMethodCode">Payment Method Code</label>
+          <input
+            type="text"
+            class="form-control"
+            name="paymentMethodCode"
+            id="field_paymentMethodCode"
+            data-cy="paymentMethodCode"
+            formControlName="paymentMethodCode"
+          />
+          @if (paymentMethodCodeRef.invalid && (paymentMethodCodeRef.dirty || paymentMethodCodeRef.touched)) {
+            <div>
+              @if (paymentMethodCodeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let idempotencyKeyRef = editForm.get('idempotencyKey')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_idempotencyKey">Idempotency Key</label>
+          <input
+            type="text"
+            class="form-control"
+            name="idempotencyKey"
+            id="field_idempotencyKey"
+            data-cy="idempotencyKey"
+            formControlName="idempotencyKey"
+          />
+          @if (idempotencyKeyRef.invalid && (idempotencyKeyRef.dirty || idempotencyKeyRef.touched)) {
+            <div>
+              @if (idempotencyKeyRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_customerEmail">Customer Email</label>
+          <input
+            type="text"
+            class="form-control"
+            name="customerEmail"
+            id="field_customerEmail"
+            data-cy="customerEmail"
+            formControlName="customerEmail"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_customerPhone">Customer Phone</label>
+          <input
+            type="text"
+            class="form-control"
+            name="customerPhone"
+            id="field_customerPhone"
+            data-cy="customerPhone"
+            formControlName="customerPhone"
+          />
+        </div>
+
+        @let createdAtRef = editForm.get('createdAt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_createdAt">Created At</label>
+          <div class="d-flex">
+            <input
+              id="field_createdAt"
+              data-cy="createdAt"
+              type="datetime-local"
+              class="form-control"
+              name="createdAt"
+              formControlName="createdAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (createdAtRef.invalid && (createdAtRef.dirty || createdAtRef.touched)) {
+            <div>
+              @if (createdAtRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!createdAtRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_completedAt">Completed At</label>
+          <div class="d-flex">
+            <input
+              id="field_completedAt"
+              data-cy="completedAt"
+              type="datetime-local"
+              class="form-control"
+              name="completedAt"
+              formControlName="completedAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tenant">Tenant</label>
+          <select
+            class="form-select"
+            id="field_tenant"
+            data-cy="tenant"
+            name="tenant"
+            formControlName="tenant"
+            [compareWith]="compareCorporateTenant"
+          >
+            @if (!editForm.get('tenant')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (corporateTenantOption of corporateTenantsSharedCollection(); track $index) {
+              <option [ngValue]="corporateTenantOption">{{ corporateTenantOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['tenant'])!.invalid && (editForm.get(['tenant'])!.dirty || editForm.get(['tenant'])!.touched)) {
+          <div>
+            @if (editForm.get(['tenant'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

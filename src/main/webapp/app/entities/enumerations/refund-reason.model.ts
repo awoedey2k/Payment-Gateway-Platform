@@ -1,0 +1,9 @@
+export enum RefundReason {
+  CUSTOMER_REQUEST_RETURN = 'CUSTOMER_REQUEST_RETURN',
+
+  FRAUD = 'FRAUD',
+
+  DUPLICATE = 'DUPLICATE',
+
+  OTHER = 'OTHER',
+}

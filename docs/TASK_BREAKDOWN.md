@@ -6,6 +6,10 @@ Source documents this traces back to:
 - **Spec** = `Payment Gateway Platform — Technical Specification.docx` (the 10-chunk technical spec)
 - **ADR** = `adr-jhipster.md` (the JHipster adoption decision record)
 
+**Amendment 2026-09-21 (project owner decision, after Chunk 1 validation):** spec requirements that no chunk owned were assigned. A new **Chunk 1b** was added after Chunk 1, and the remaining items were added to Chunks 4, 7, 9 and 10 (each marked "added 2026-09-21"). The document now describes fourteen chunks (0, 1, 1b, 2-12).
+
+**Amendment 2026-09-23 (project owner decision, after Chunk 1 validator run 2):** run 2 found the 2026-09-21 hand-off to Chunk 10 had a deliverable but no matching test or acceptance criterion — fixed below (marked "fixed 2026-09-23"). Run 2 also found three more spec requirements no chunk owned: the §2.1 KYB document payload and its submission step (assigned to **Chunk 1b**, since only its self-serve flow gives a merchant a way to submit documents), automated tenant-suspension triggers for chargeback-ratio breach and AML/fraud alarms (assigned to **Chunk 8** and **Chunk 9** respectively), and escrow-hold/payout-freeze on `SUSPENDED` plus final reconciliation on `CLOSED` (assigned to **Chunk 7**, distinct from that chunk's existing settlement-account precondition). A residual security gap (`/api/users` lets a self-registered plain user enumerate staff accounts, unchanged generated behavior) was assigned to **Chunk 11**. All items marked "added 2026-09-23" below.
+
 General rules that apply to every chunk, not repeated in each entry below:
 - Branch names are exactly as written here — self-descriptive, `chunk-NN-short-name` format.
 - Update the relevant documentation *before* the commit that finishes the chunk, not after.
@@ -35,7 +39,7 @@ General rules that apply to every chunk, not repeated in each entry below:
 
 **Acceptance criteria**
 - [ ] App builds and starts locally against Postgres.
-- [ ] All 24 entities from the JDL are present with generated REST resources, services, and Liquibase changelogs.
+- [ ] All 25 entities from the JDL are present with generated REST resources, services, and Liquibase changelogs.
 - [ ] Generated Angular admin screens load for at least one entity per module, confirming the client build is sound.
 - [ ] README lets a new developer get the app running with no undocumented steps.
 
@@ -64,6 +68,38 @@ General rules that apply to every chunk, not repeated in each entry below:
 - [ ] All three KYC score bands from Figure 2.2 produce the documented outcome.
 - [ ] A revoked API key is rejected by auth immediately, and a key inside its grace period still authenticates.
 - [ ] Suspending a tenant blocks new transaction creation for that tenant (cross-checked against Chunk 4's Transaction module).
+
+---
+
+## Chunk 1b — Tenant Users, RBAC & Self-Serve Registration
+
+**Branch:** `chunk-01b-tenant-users-rbac`
+**Depends on:** Chunk 1
+**Spec reference:** Chunk 2 §1.1 (self-serve signup, sandbox test keys), §3 (RBAC & User Management)
+**Added 2026-09-21** by project owner decision: these spec requirements were owned by no chunk.
+
+**Deliverables**
+- `AppUser` (merchant-side user, tenant-scoped; separate from JHipster's staff `User`, per the ADR/JDL note that the two auth systems are not unified): email, password hash, role, MFA secret and flag. Data-model changes go through the JDL.
+- The four tenant roles (`ROLE_TENANT_ADMIN`, `ROLE_FINANCE`, `ROLE_DEVELOPER`, `ROLE_SUPPORT`) with the capability/restriction matrix of spec §3.1 enforced, including tenant-scoped authorization (a tenant user can never act on another tenant).
+- MFA enrolment and verification for tenant users.
+- Team-member invitation by a tenant admin.
+- Self-serve registration `POST /api/v1/auth/register-tenant`: creates a `PENDING_REVIEW` tenant with `kycStatus = NOT_STARTED`, its first `ROLE_TENANT_ADMIN` user, and automatically issued TEST API keys (LIVE stays locked until activation).
+- *(added 2026-09-23, hand-off from Chunk 1)* The spec §2.1 KYB document payload — `proofOfAddressDocUrl` and `certificateOfIncorporationUrl` on the tenant application, `verificationDocUrl` per director — and the submission step this feeds (Figure 2.2 step 1, "Submit KYB Docs"). Data-model changes go through the JDL. A merchant needs a way to submit these: the generated admin CRUD is now `ROLE_ADMIN`-only (Chunk 1's lockdown), so submission must go through this chunk's self-serve/tenant-user endpoints, not the generated screens.
+
+**Documentation to update**
+- `docs/modules/tenant-users.md`: the role/permission matrix as implemented, the registration flow, and how merchant-user authentication relates to staff JWT and API-key authentication.
+
+**Tests required**
+- Unit tests for the permission matrix: every role allowed/denied for every capability the spec lists.
+- Integration test: registration yields a `PENDING_REVIEW` tenant, a tenant-admin user and a working TEST key, and no ability to create LIVE keys.
+- Integration test: a tenant user cannot read or change another tenant's data or keys.
+- *(added 2026-09-23)* Integration test: a tenant admin submits the KYB document payload (proof of address, certificate of incorporation, per-director verification doc) through this chunk's endpoint; the onboarding screening in Chunk 1 can read what was submitted.
+
+**Acceptance criteria**
+- [ ] Each role restriction in spec §3.1 is enforced (for example, only `ROLE_TENANT_ADMIN` can trigger key rotation; `ROLE_SUPPORT` cannot see raw API secrets).
+- [ ] Self-serve registration produces a sandbox-only tenant that cannot process live requests until KYC approval.
+- [ ] Merchant users cannot authenticate to staff-only endpoints, and staff accounts cannot act as merchant users.
+- [ ] *(added 2026-09-23)* A tenant admin can submit the full §2.1 KYB document payload without staff/admin involvement, and the submitted URLs are visible to the onboarding workflow from Chunk 1.
 
 ---
 
@@ -123,6 +159,7 @@ General rules that apply to every chunk, not repeated in each entry below:
 - Transaction state machine (PENDING → AUTHORIZED/SUCCESSFUL/FAILED/REVERSED) matching Figure 5.2's full request lifecycle, including the asynchronous challenge/webhook-confirmation path.
 - Distributed idempotency enforcement on the charge-creation endpoint, backed by the unique `idempotencyKey` constraint already in the JDL.
 - `POST /api/v1/charges`, authorize/capture, and refund REST endpoints per Chunk 10 §2's documented payload contracts.
+- *(added 2026-09-21, hand-off from Chunk 1)* Tenant status enforcement on every one of those endpoints: call `TenantAccessGuard.assertCanTransact` (or sit behind the merchant API-key chain) and **re-check the tenant status inside the charge transaction under the tenant row lock**, so a suspension committing between the check and the insert cannot let a charge through.
 
 **Documentation to update**
 - `docs/modules/transaction.md`: the state diagram, and the idempotency guarantee stated precisely (what "duplicate" means, what the retried caller gets back).
@@ -131,10 +168,12 @@ General rules that apply to every chunk, not repeated in each entry below:
 **Tests required**
 - Unit tests for every state transition, including rejected illegal transitions.
 - Integration test: fire the same idempotency key twice concurrently, assert exactly one Transaction row is created and both callers get the same response.
+- *(added 2026-09-21)* Integration test: suspend a tenant, `POST /api/v1/charges` with its key, expect 403 `TENANT_SUSPENDED` and no Transaction row; plus a race test proving a suspension concurrent with a charge cannot produce a charge after the suspension commits. This completes Chunk 1's "suspending a tenant blocks new transaction creation" criterion.
 
 **Acceptance criteria**
 - [ ] A retried request with the same idempotency key never creates a second Transaction, under concurrent load, not just sequential.
 - [ ] The REST payloads match Chunk 10 §2's documented request/response shapes.
+- [ ] *(added 2026-09-21)* A suspended, rejected, closed or (for LIVE) unverified tenant can never create a transaction, including under a concurrent suspension.
 
 ---
 
@@ -198,6 +237,8 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 - MERCHANT vs. CUSTOMER fee-bearer handling, gated per corridor by card-network surcharge rules.
 - Scheduled payout execution per `PayoutSchedule` frequency, with per-tenant `SettlementBatch` isolation so one tenant's bank rejection never blocks another's run.
 - Cross-border clearing: FX conversion locked at batch-creation time (reusing Chunk 2's ForexRate lock).
+- *(added 2026-09-21)* Designated settlement account precondition (spec Chunk 2 §1.1 `ACTIVE` state definition): a tenant may not be activated or receive payouts without a designated settlement account. Implemented as an additional guard on the `ACTIVE` transition in the tenant lifecycle (in `extended`), not by editing generated code.
+- *(added 2026-09-23, hand-off from Chunk 1)* The spec §1.1 financial consequences of `SUSPENDED` and `CLOSED`: on `SUSPENDED`, funds are held in escrow and automated payouts are frozen; on `CLOSED`, the final payout is settled and any lingering settlement balance is cleared via manual final reconciliation. Hook into `TenantLifecycleService`'s transition points (in `extended`), not by editing generated code.
 
 **Documentation to update**
 - `docs/modules/fees-payouts.md`: the fee resolution hierarchy worked through an example, and the payout batch state machine.
@@ -205,10 +246,13 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 **Tests required**
 - Unit tests for the fee-resolution hierarchy, including the fail-closed case when no tier matches.
 - Integration test: one tenant's payout batch fails (simulated bank rejection), confirm other tenants' batches in the same run complete unaffected and the failed batch's wallet debit is atomically reversed.
+- *(added 2026-09-23)* Integration test: suspending an `ACTIVE` tenant freezes its scheduled payouts and holds funds in escrow; closing a tenant settles its final payout and clears any remaining balance via the manual reconciliation path.
 
 **Acceptance criteria**
 - [ ] An unpriced transaction is rejected at checkout-session creation, never silently charged at zero fee.
 - [ ] A failed payout never leaves funds "in limbo" between debited-from-tenant and confirmed-received-by-bank.
+- [ ] *(added 2026-09-21)* A tenant without a designated settlement account cannot become `ACTIVE` or be paid out.
+- [ ] *(added 2026-09-23)* A suspended tenant's payouts are frozen and its funds held in escrow; a closed tenant's final payout settles and any lingering balance is cleared by manual reconciliation, never left unresolved.
 
 ---
 
@@ -223,6 +267,7 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 - Evidence upload with checksum verification (reject a payload whose declared `sha256Checksum` doesn't match the uploaded file, synchronously).
 - Deadline enforcement: evidence submitted after `dueDate` is rejected with a specific error rather than silently accepted.
 - Negative-balance handling: a chargeback exceeding available balance becomes a tracked negative balance with the three escalating mitigation triggers from the spec (settlement interception, backup-instrument debit, payout freeze).
+- *(added 2026-09-23, hand-off from Chunk 1)* Automated tenant suspension on chargeback-ratio breach (spec §1.1 `SUSPENDED` state definition: chargeback ratio > 1%). Compute the ratio from this chunk's dispute data and call `TenantLifecycleService.transition(tenantId, SUSPENDED, reason)` (in `extended`) when it's crossed; do not edit generated code.
 
 **Documentation to update**
 - `docs/modules/disputes.md`: the state machine, and the negative-balance mitigation ladder as a first-class documented behavior, not an error case.
@@ -230,10 +275,12 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 **Tests required**
 - Unit tests for every dispute state transition and the two rejection paths (late evidence, checksum mismatch).
 - Integration test: dispute opened against a tenant with insufficient available balance, confirm the negative-balance state and first mitigation trigger fire correctly.
+- *(added 2026-09-23)* Integration test: a tenant's chargeback ratio crosses 1%, confirm it is automatically transitioned to `SUSPENDED` with a recorded reason, and that it stays below the threshold does not.
 
 **Acceptance criteria**
 - [ ] Every dispute resolution (WON or LOST) produces the correct balanced journal entry from Chunk 6, matching the spec's worked examples.
 - [ ] A negative available balance is a valid, queryable, non-error state.
+- [ ] *(added 2026-09-23)* A tenant whose chargeback ratio exceeds 1% is automatically suspended, without administrative intervention.
 
 ---
 
@@ -246,7 +293,9 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 **Deliverables**
 - AML rule engine per the decision tree in the spec (sanctions/PEP check, velocity check, geolocation/proxy check, card-testing detection, cumulative risk score → ALLOW/CHALLENGE/REJECT).
 - Hash-chained `AuditLogEntry` writer: every entry's hash depends on the previous entry's hash, and a verification routine that walks the chain and detects tampering.
+- *(added 2026-09-21)* KYC/KYB evidence from Chunk 1 (which signals fired, score, decision, reviewer) persisted as tamper-evident audit-log entries; KYC rejections filed to the internal compliance dashboard; the Tier-2 manual-review queue with its 24-hour target (spec Chunk 2 §2, Figure 2.2).
 - Encryption-key rotation tracking hooks for the KMS-backed envelope encryption described in the spec (the KMS integration itself may be stubbed/mocked in this chunk if no KMS is provisioned yet — document that explicitly if so).
+- *(added 2026-09-23, hand-off from Chunk 1)* Automated tenant suspension on an AML/fraud alarm (spec §1.1 `SUSPENDED` state definition). When this chunk's AML rule engine raises a REJECT-band alarm attributable to the tenant itself (not a single transaction), call `TenantLifecycleService.transition(tenantId, SUSPENDED, reason)` (in `extended`) rather than editing generated code.
 
 **Documentation to update**
 - `docs/security/aml-audit.md`: the AML decision tree as implemented, and how to run the hash-chain verification routine.
@@ -254,10 +303,13 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 **Tests required**
 - Unit tests for each AML rule and the cumulative scoring bands (ALLOW < 30, CHALLENGE 30–75, REJECT > 75, per the spec's decision tree).
 - Integration test that tampers with one AuditLogEntry mid-chain and confirms the verification routine detects it.
+- *(added 2026-09-23)* Integration test: a tenant-level AML alarm fires, confirm the tenant is automatically transitioned to `SUSPENDED` with a recorded reason.
 
 **Acceptance criteria**
 - [ ] All four AML rules (sanctions, velocity, geolocation, card-testing) are independently testable and independently triggerable.
 - [ ] Tampering with any single audit log entry is detectable by the chain-verification routine.
+- [ ] *(added 2026-09-21)* Every KYC decision made in Chunk 1's workflow has a corresponding hash-chained audit entry, and manual-review applications appear in a queue with a due time.
+- [ ] *(added 2026-09-23)* A tenant-level AML/fraud alarm automatically suspends the tenant, without administrative intervention.
 
 ---
 
@@ -270,6 +322,7 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 **Deliverables**
 - Outbound webhook dispatcher: HMAC-SHA256 signing, replay-attack timestamp guard, retry with backoff, delivery-attempt logging (`WebhookDeliveryAttempt`).
 - The three integration models' supporting infrastructure (Hosted Checkout redirect, Drop-in SDK hosted-fields endpoint, Direct Server API) to the extent each needs distinct backend support.
+- *(added 2026-09-21)* Onboarding/status notifications to the merchant by email and webhook (spec Chunk 2 Figure 2.2 step 5); public `pk_` keys and the public `key_id` handle for the checkout SDK (spec Chunk 2 §4.1); the white-label configuration (branding, custom-domain SSL/DNS verification state, CDN/CSP asset isolation; spec Chunk 2 §5).
 - A written migration runbook translating the spec's Chunk 10 three-phase roadmap (extract Transaction/Routing behind Kafka, then isolate the ledger, then the webhook dispatcher) into concrete follow-up chunks for when those triggers are actually hit — this is documentation, not code, since the ADR's decision is not to build the microservices split prematurely.
 
 **Documentation to update**
@@ -279,10 +332,12 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 **Tests required**
 - Unit test for the HMAC signing/verification round trip, including the replay-guard timestamp rejection.
 - Integration test: a merchant endpoint that times out, confirm retry-with-backoff behavior and that it doesn't block other tenants' webhook delivery.
+- *(fixed 2026-09-23 — the 2026-09-21 hand-off added a deliverable here with no matching test, found by validator run 2)* Integration test: an onboarding status change dispatches both an email and a webhook notification to the merchant; `pk_`/`key_id` are exposed to the checkout SDK without ever exposing the secret; a tenant with white-label branding configured serves its custom domain/CSS/CDN assets in isolation from the platform default.
 
 **Acceptance criteria**
 - [ ] A tampered webhook payload fails signature verification.
 - [ ] A slow or failing merchant webhook endpoint never blocks delivery to other tenants (matches the spec's stated migration trigger for extracting this into its own worker).
+- [ ] *(fixed 2026-09-23 — see test note above)* A tenant's onboarding/status changes reach the merchant by both email and webhook; the checkout SDK can resolve a `pk_`/`key_id` pair without ever seeing the corresponding secret; a white-labelled tenant's assets never leak onto or absorb another tenant's branding.
 
 ---
 
@@ -296,6 +351,7 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 - Structured logging and metrics for every module, with the P95 latency budget from the spec's Executive Summary made measurable (dashboards or equivalent).
 - Rate limiting on public API endpoints, per tenant and per API key.
 - A documented incident-response / recoverability runbook for at least the failure modes explicitly named across the spec's per-chunk edge-case sections (RLS pool leakage, Redis outage fail-closed behavior, KMS outage, webhook endpoint failure).
+- *(added 2026-09-23, hand-off from Chunk 1)* `/api/users` is excluded from Chunk 1's `GeneratedCrudLockdownConfiguration` (the generated self-registration flow reads it) and the generated `PublicUserResource` has no `@PreAuthorize`, so any self-registered `ROLE_USER` can enumerate every staff account through it. Close this without editing generated code — e.g. an `extended` security rule scoped to `/api/users` that this chunk adds.
 
 **Documentation to update**
 - `docs/operations/observability.md` and `docs/operations/incident-runbook.md`.
@@ -303,10 +359,12 @@ This chunk is cross-cutting and touches every tenant-scoped entity generated in 
 **Tests required**
 - Integration test proving rate limiting actually rejects over-limit traffic per tenant without affecting other tenants.
 - A load test establishing a baseline P95 latency figure against the spec's committed budget.
+- *(added 2026-09-23)* Integration test: a self-registered plain user can no longer enumerate staff accounts via `/api/users`, while the generated self-registration flow that reads it still works.
 
 **Acceptance criteria**
 - [ ] Every named failure mode in the spec's edge-case sections has a corresponding entry in the incident runbook.
 - [ ] Measured P95 latency for the synchronous checkout path (Chunk 5, Figure 5.2, steps 1–5) meets the spec's committed budget.
+- [ ] *(added 2026-09-23)* A self-registered plain user cannot enumerate staff accounts through `/api/users`.
 
 ---
 
@@ -339,13 +397,14 @@ This is the project's completion gate, not a feature chunk. Nothing after this c
 
 | Module (from the ADR) | Chunks |
 | --- | --- |
-| Tenant | 1 |
+| Tenant | 1, 1b |
 | Catalog & FX | 2 |
 | Routing | 3 |
 | Transaction | 4 |
 | (cross-cutting) Multi-tenancy | 5 |
-| Settlement | 6, 7 |
-| Audit & AML | 8, 9 |
+| Settlement (ledger, wallets, fees, payouts) | 6, 7 |
+| Settlement (disputes) | 8 |
+| Audit & AML | 9 |
 | Integration | 10 |
 | (cross-cutting) Operations | 11 |
 | (gate) Validation | 12 |

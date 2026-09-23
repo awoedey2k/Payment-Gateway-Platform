@@ -1,0 +1,5 @@
+export enum RoutingRuleScope {
+  TENANT_CUSTOM = 'TENANT_CUSTOM',
+
+  PLATFORM_GLOBAL = 'PLATFORM_GLOBAL',
+}

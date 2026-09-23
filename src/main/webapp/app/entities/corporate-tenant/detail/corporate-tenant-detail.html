@@ -1,0 +1,88 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (corporateTenant(); as corporateTenantRef) {
+      <div>
+        <h2 data-cy="corporateTenantDetailsHeading"><span>Corporate Tenant</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ corporateTenantRef.id }}</span>
+          </dd>
+          <dt><span>Legal Business Name</span></dt>
+          <dd>
+            <span>{{ corporateTenantRef.legalBusinessName }}</span>
+          </dd>
+          <dt><span>Business Registration Number</span></dt>
+          <dd>
+            <span>{{ corporateTenantRef.businessRegistrationNumber }}</span>
+          </dd>
+          <dt><span>Tax Identification Number</span></dt>
+          <dd>
+            <span>{{ corporateTenantRef.taxIdentificationNumber }}</span>
+          </dd>
+          <dt><span>Operating Jurisdiction</span></dt>
+          <dd>
+            <span>{{
+              { null: '', NG: 'NG', KE: 'KE', GH: 'GH', ZA: 'ZA', DE: 'DE', US: 'US', GB: 'GB' }[
+                corporateTenantRef.operatingJurisdiction ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span>Status</span></dt>
+          <dd>
+            <span>{{
+              {
+                null: '',
+                PENDING_REVIEW: 'PENDING_REVIEW',
+                ACTIVE: 'ACTIVE',
+                SUSPENDED: 'SUSPENDED',
+                REJECTED: 'REJECTED',
+                CLOSED: 'CLOSED',
+              }[corporateTenantRef.status ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Kyc Status</span></dt>
+          <dd>
+            <span>{{
+              {
+                null: '',
+                NOT_STARTED: 'NOT_STARTED',
+                PENDING: 'PENDING',
+                APPROVED: 'APPROVED',
+                REJECTED: 'REJECTED',
+                MANUAL_REVIEW: 'MANUAL_REVIEW',
+              }[corporateTenantRef.kycStatus ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Risk Score</span></dt>
+          <dd>
+            <span>{{ corporateTenantRef.riskScore }}</span>
+          </dd>
+          <dt><span>Created At</span></dt>
+          <dd>
+            <span>{{ corporateTenantRef.createdAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Activated At</span></dt>
+          <dd>
+            <span>{{ corporateTenantRef.activatedAt | formatMediumDatetime }}</span>
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/corporate-tenant', corporateTenantRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

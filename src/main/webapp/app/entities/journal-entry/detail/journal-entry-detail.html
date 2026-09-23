@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (journalEntry(); as journalEntryRef) {
+      <div>
+        <h2 data-cy="journalEntryDetailsHeading"><span>Journal Entry</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ journalEntryRef.id }}</span>
+          </dd>
+          <dt><span>Reference</span></dt>
+          <dd>
+            <span>{{ journalEntryRef.reference }}</span>
+          </dd>
+          <dt><span>Description</span></dt>
+          <dd>
+            <span>{{ journalEntryRef.description }}</span>
+          </dd>
+          <dt><span>Posted At</span></dt>
+          <dd>
+            <span>{{ journalEntryRef.postedAt | formatMediumDatetime }}</span>
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/journal-entry', journalEntryRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,64 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (tenantDirector(); as tenantDirectorRef) {
+      <div>
+        <h2 data-cy="tenantDirectorDetailsHeading"><span>Tenant Director</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ tenantDirectorRef.id }}</span>
+          </dd>
+          <dt><span>Full Name</span></dt>
+          <dd>
+            <span>{{ tenantDirectorRef.fullName }}</span>
+          </dd>
+          <dt><span>Date Of Birth</span></dt>
+          <dd>
+            <span>{{ tenantDirectorRef.dateOfBirth | formatMediumDate }}</span>
+          </dd>
+          <dt><span>Nationality</span></dt>
+          <dd>
+            <span>{{
+              { null: '', NG: 'NG', KE: 'KE', GH: 'GH', ZA: 'ZA', DE: 'DE', US: 'US', GB: 'GB' }[tenantDirectorRef.nationality ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Identification Type</span></dt>
+          <dd>
+            <span>{{
+              { null: '', NATIONAL_ID: 'NATIONAL_ID', PASSPORT: 'PASSPORT', DRIVERS_LICENSE: 'DRIVERS_LICENSE' }[
+                tenantDirectorRef.identificationType ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span>Identification Number</span></dt>
+          <dd>
+            <span>{{ tenantDirectorRef.identificationNumber }}</span>
+          </dd>
+          <dt><span>Tenant</span></dt>
+          <dd>
+            @if (tenantDirector()!.tenant) {
+              <div>
+                <a [routerLink]="['/corporate-tenant', tenantDirector()!.tenant?.id, 'view']">{{ tenantDirectorRef.tenant?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/tenant-director', tenantDirectorRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

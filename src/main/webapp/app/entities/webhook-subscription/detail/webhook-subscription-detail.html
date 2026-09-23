@@ -1,0 +1,52 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (webhookSubscription(); as webhookSubscriptionRef) {
+      <div>
+        <h2 data-cy="webhookSubscriptionDetailsHeading"><span>Webhook Subscription</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ webhookSubscriptionRef.id }}</span>
+          </dd>
+          <dt><span>Target Url</span></dt>
+          <dd>
+            <span>{{ webhookSubscriptionRef.targetUrl }}</span>
+          </dd>
+          <dt><span>Secret Hash</span></dt>
+          <dd>
+            <span>{{ webhookSubscriptionRef.secretHash }}</span>
+          </dd>
+          <dt><span>Is Active</span></dt>
+          <dd>
+            <span>{{ webhookSubscriptionRef.isActive }}</span>
+          </dd>
+          <dt><span>Tenant</span></dt>
+          <dd>
+            @if (webhookSubscription()!.tenant) {
+              <div>
+                <a [routerLink]="['/corporate-tenant', webhookSubscription()!.tenant?.id, 'view']">{{
+                  webhookSubscriptionRef.tenant?.id
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/webhook-subscription', webhookSubscriptionRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

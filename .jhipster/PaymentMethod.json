@@ -1,0 +1,31 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173143"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "code",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "displayName",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "category",
+      "fieldType": "PaymentMethodCategory",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "CARD,BANK_TRANSFER,MOBILE_MONEY,USSD,WALLET"
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "PaymentMethod",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

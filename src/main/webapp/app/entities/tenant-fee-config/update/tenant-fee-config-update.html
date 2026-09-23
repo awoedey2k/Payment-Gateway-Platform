@@ -1,0 +1,167 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-tenant-fee-config-heading" data-cy="TenantFeeConfigCreateUpdateHeading">Create or edit a Tenant Fee Config</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let fixedFeeRef = editForm.get('fixedFee')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_fixedFee">Fixed Fee</label>
+          <input type="number" class="form-control" name="fixedFee" id="field_fixedFee" data-cy="fixedFee" formControlName="fixedFee" />
+          @if (fixedFeeRef.invalid && (fixedFeeRef.dirty || fixedFeeRef.touched)) {
+            <div>
+              @if (fixedFeeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!fixedFeeRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let percentageFeeRef = editForm.get('percentageFee')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_percentageFee">Percentage Fee</label>
+          <input
+            type="number"
+            class="form-control"
+            name="percentageFee"
+            id="field_percentageFee"
+            data-cy="percentageFee"
+            formControlName="percentageFee"
+          />
+          @if (percentageFeeRef.invalid && (percentageFeeRef.dirty || percentageFeeRef.touched)) {
+            <div>
+              @if (percentageFeeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!percentageFeeRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_capAmount">Cap Amount</label>
+          <input type="number" class="form-control" name="capAmount" id="field_capAmount" data-cy="capAmount" formControlName="capAmount" />
+        </div>
+
+        @let feeBearerRef = editForm.get('feeBearer')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_feeBearer">Fee Bearer</label>
+          <select class="form-select" name="feeBearer" formControlName="feeBearer" id="field_feeBearer" data-cy="feeBearer">
+            <option [ngValue]="null"></option>
+            @for (feeBearer of feeBearerValues; track $index) {
+              <option [value]="feeBearer">{{ { null: '', MERCHANT: 'MERCHANT', CUSTOMER: 'CUSTOMER' }[feeBearer] }}</option>
+            }
+          </select>
+          @if (feeBearerRef.invalid && (feeBearerRef.dirty || feeBearerRef.touched)) {
+            <div>
+              @if (feeBearerRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let isActiveRef = editForm.get('isActive')!;
+        <div class="mb-3 form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            name="isActive"
+            id="field_isActive"
+            data-cy="isActive"
+            formControlName="isActive"
+          />
+          <label class="form-check-label" for="field_isActive">Is Active</label>
+          @if (isActiveRef.invalid && (isActiveRef.dirty || isActiveRef.touched)) {
+            <div>
+              @if (isActiveRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tenant">Tenant</label>
+          <select
+            class="form-select"
+            id="field_tenant"
+            data-cy="tenant"
+            name="tenant"
+            formControlName="tenant"
+            [compareWith]="compareCorporateTenant"
+          >
+            @if (!editForm.get('tenant')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (corporateTenantOption of corporateTenantsSharedCollection(); track $index) {
+              <option [ngValue]="corporateTenantOption">{{ corporateTenantOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (editForm.get(['tenant'])!.invalid && (editForm.get(['tenant'])!.dirty || editForm.get(['tenant'])!.touched)) {
+          <div>
+            @if (editForm.get(['tenant'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+
+        <div class="mb-3">
+          <label class="form-label" for="field_countryPaymentMethod">Country Payment Method</label>
+          <select
+            class="form-select"
+            id="field_countryPaymentMethod"
+            data-cy="countryPaymentMethod"
+            name="countryPaymentMethod"
+            formControlName="countryPaymentMethod"
+            [compareWith]="compareCountryPaymentMethod"
+          >
+            @if (!editForm.get('countryPaymentMethod')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (countryPaymentMethodOption of countryPaymentMethodsSharedCollection(); track $index) {
+              <option [ngValue]="countryPaymentMethodOption">{{ countryPaymentMethodOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (
+          editForm.get(['countryPaymentMethod'])!.invalid &&
+          (editForm.get(['countryPaymentMethod'])!.dirty || editForm.get(['countryPaymentMethod'])!.touched)
+        ) {
+          <div>
+            @if (editForm.get(['countryPaymentMethod'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

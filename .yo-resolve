@@ -1,0 +1,2 @@
+# Keep our hand-written README; the generator must not overwrite it on regeneration
+README.md skip

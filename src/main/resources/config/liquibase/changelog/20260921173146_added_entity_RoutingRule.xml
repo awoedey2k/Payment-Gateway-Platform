@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity RoutingRule.
+    -->
+    <changeSet id="20260921173146-1" author="jhipster">
+        <createTable tableName="routing_rule">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="priority" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="scope" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="country_code" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="currency_code" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="card_brand" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="primary_adapter" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="fallback_adapter" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="max_retries" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="is_active" type="boolean">
+                <constraints nullable="false" />
+            </column>
+            <column name="tenant_id" type="bigint">
+                <constraints nullable="true" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

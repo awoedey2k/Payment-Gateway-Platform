@@ -1,0 +1,11 @@
+export enum TransactionStatus {
+  PENDING = 'PENDING',
+
+  AUTHORIZED = 'AUTHORIZED',
+
+  SUCCESSFUL = 'SUCCESSFUL',
+
+  FAILED = 'FAILED',
+
+  REVERSED = 'REVERSED',
+}

@@ -1,0 +1,136 @@
+<div>
+  <h2 id="page-heading" data-cy="JournalLineHeading">
+    <span>Journal Lines</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-journal-line"
+        [routerLink]="['/journal-line/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Journal Line</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (journalLines().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Journal Lines found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="debitAmount">
+              <div class="d-flex">
+                <span>Debit Amount</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="creditAmount">
+              <div class="d-flex">
+                <span>Credit Amount</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="account.id">
+              <div class="d-flex">
+                <span>Account</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="journalEntry.id">
+              <div class="d-flex">
+                <span>Journal Entry</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (journalLine of journalLines(); track trackId(journalLine)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/journal-line', journalLine.id, 'view']">{{ journalLine.id }}</a>
+              </td>
+              <td>{{ journalLine.debitAmount }}</td>
+              <td>{{ journalLine.creditAmount }}</td>
+              <td>
+                @if (journalLine.account) {
+                  <div>
+                    <a [routerLink]="['/ledger-account', journalLine.account.id, 'view']">{{ journalLine.account.id }}</a>
+                  </div>
+                }
+              </td>
+              <td>
+                @if (journalLine.journalEntry) {
+                  <div>
+                    <a [routerLink]="['/journal-entry', journalLine.journalEntry.id, 'view']">{{ journalLine.journalEntry.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a [routerLink]="['/journal-line', journalLine.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/journal-line', journalLine.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(journalLine)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (journalLines().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

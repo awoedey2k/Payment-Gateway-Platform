@@ -1,0 +1,48 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173158"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "riskScore",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "decision",
+      "fieldType": "AmlDecision",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ALLOW,CHALLENGE,REJECT,TIER_REVIEW"
+    },
+    {
+      "fieldName": "ruleTriggered",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "checkedAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "AmlCheck",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "corporateTenant",
+      "relationshipName": "tenant",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "transaction",
+      "relationshipName": "transaction",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

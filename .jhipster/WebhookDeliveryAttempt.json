@@ -1,0 +1,48 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173201"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "eventType",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "WebhookDeliveryStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PENDING,DELIVERED,FAILED,RETRYING"
+    },
+    {
+      "fieldName": "httpStatusCode",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "attemptNumber",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "attemptedAt",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "WebhookDeliveryAttempt",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "webhookSubscription",
+      "relationshipName": "subscription",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one",
+      "relationshipValidateRules": "required"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (forexRate(); as forexRateRef) {
+      <div>
+        <h2 data-cy="forexRateDetailsHeading"><span>Forex Rate</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ forexRateRef.id }}</span>
+          </dd>
+          <dt><span>Base Currency</span></dt>
+          <dd>
+            <span>{{ forexRateRef.baseCurrency }}</span>
+          </dd>
+          <dt><span>Quote Currency</span></dt>
+          <dd>
+            <span>{{ forexRateRef.quoteCurrency }}</span>
+          </dd>
+          <dt><span>Rate</span></dt>
+          <dd>
+            <span>{{ forexRateRef.rate }}</span>
+          </dd>
+          <dt><span>Platform Spread Bps</span></dt>
+          <dd>
+            <span>{{ forexRateRef.platformSpreadBps }}</span>
+          </dd>
+          <dt><span>Locked At</span></dt>
+          <dd>
+            <span>{{ forexRateRef.lockedAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Expires At</span></dt>
+          <dd>
+            <span>{{ forexRateRef.expiresAt | formatMediumDatetime }}</span>
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/forex-rate', forexRateRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

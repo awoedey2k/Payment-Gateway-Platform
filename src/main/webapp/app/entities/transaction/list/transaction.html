@@ -1,0 +1,228 @@
+<div>
+  <h2 id="page-heading" data-cy="TransactionHeading">
+    <span>Transactions</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-transaction"
+        [routerLink]="['/transaction/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Transaction</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (transactions().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Transactions found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="reference">
+              <div class="d-flex">
+                <span>Reference</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tenantReference">
+              <div class="d-flex">
+                <span>Tenant Reference</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="status">
+              <div class="d-flex">
+                <span>Status</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="amount">
+              <div class="d-flex">
+                <span>Amount</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="feeAmount">
+              <div class="d-flex">
+                <span>Fee Amount</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="netAmount">
+              <div class="d-flex">
+                <span>Net Amount</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="currencyCode">
+              <div class="d-flex">
+                <span>Currency Code</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="countryCode">
+              <div class="d-flex">
+                <span>Country Code</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="paymentMethodCode">
+              <div class="d-flex">
+                <span>Payment Method Code</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="idempotencyKey">
+              <div class="d-flex">
+                <span>Idempotency Key</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="customerEmail">
+              <div class="d-flex">
+                <span>Customer Email</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="customerPhone">
+              <div class="d-flex">
+                <span>Customer Phone</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="createdAt">
+              <div class="d-flex">
+                <span>Created At</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="completedAt">
+              <div class="d-flex">
+                <span>Completed At</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="tenant.id">
+              <div class="d-flex">
+                <span>Tenant</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (transaction of transactions(); track trackId(transaction)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/transaction', transaction.id, 'view']">{{ transaction.id }}</a>
+              </td>
+              <td>{{ transaction.reference }}</td>
+              <td>{{ transaction.tenantReference }}</td>
+              <td>
+                {{
+                  {
+                    null: '',
+                    PENDING: 'PENDING',
+                    AUTHORIZED: 'AUTHORIZED',
+                    SUCCESSFUL: 'SUCCESSFUL',
+                    FAILED: 'FAILED',
+                    REVERSED: 'REVERSED',
+                  }[transaction.status ?? 'null']
+                }}
+              </td>
+              <td>{{ transaction.amount }}</td>
+              <td>{{ transaction.feeAmount }}</td>
+              <td>{{ transaction.netAmount }}</td>
+              <td>{{ transaction.currencyCode }}</td>
+              <td>{{ transaction.countryCode }}</td>
+              <td>{{ transaction.paymentMethodCode }}</td>
+              <td>{{ transaction.idempotencyKey }}</td>
+              <td>{{ transaction.customerEmail }}</td>
+              <td>{{ transaction.customerPhone }}</td>
+              <td>{{ transaction.createdAt | formatMediumDatetime }}</td>
+              <td>{{ transaction.completedAt | formatMediumDatetime }}</td>
+              <td>
+                @if (transaction.tenant) {
+                  <div>
+                    <a [routerLink]="['/corporate-tenant', transaction.tenant.id, 'view']">{{ transaction.tenant.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <button
+                    type="submit"
+                    [routerLink]="['/refund']"
+                    [queryParams]="{ 'filter[transactionId.in]': transaction.id }"
+                    class="btn btn-info btn-sm"
+                    data-cy="filterOtherEntityButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">Show Refund</span>
+                  </button>
+                  <a [routerLink]="['/transaction', transaction.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a [routerLink]="['/transaction', transaction.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(transaction)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (transactions().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,158 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-webhook-delivery-attempt-heading" data-cy="WebhookDeliveryAttemptCreateUpdateHeading">
+        Create or edit a Webhook Delivery Attempt
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let eventTypeRef = editForm.get('eventType')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_eventType">Event Type</label>
+          <input type="text" class="form-control" name="eventType" id="field_eventType" data-cy="eventType" formControlName="eventType" />
+          @if (eventTypeRef.invalid && (eventTypeRef.dirty || eventTypeRef.touched)) {
+            <div>
+              @if (eventTypeRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let statusRef = editForm.get('status')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_status">Status</label>
+          <select class="form-select" name="status" formControlName="status" id="field_status" data-cy="status">
+            <option [ngValue]="null"></option>
+            @for (webhookDeliveryStatus of webhookDeliveryStatusValues; track $index) {
+              <option [value]="webhookDeliveryStatus">
+                {{
+                  { null: '', PENDING: 'PENDING', DELIVERED: 'DELIVERED', FAILED: 'FAILED', RETRYING: 'RETRYING' }[webhookDeliveryStatus]
+                }}
+              </option>
+            }
+          </select>
+          @if (statusRef.invalid && (statusRef.dirty || statusRef.touched)) {
+            <div>
+              @if (statusRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_httpStatusCode">Http Status Code</label>
+          <input
+            type="number"
+            class="form-control"
+            name="httpStatusCode"
+            id="field_httpStatusCode"
+            data-cy="httpStatusCode"
+            formControlName="httpStatusCode"
+          />
+        </div>
+
+        @let attemptNumberRef = editForm.get('attemptNumber')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_attemptNumber">Attempt Number</label>
+          <input
+            type="number"
+            class="form-control"
+            name="attemptNumber"
+            id="field_attemptNumber"
+            data-cy="attemptNumber"
+            formControlName="attemptNumber"
+          />
+          @if (attemptNumberRef.invalid && (attemptNumberRef.dirty || attemptNumberRef.touched)) {
+            <div>
+              @if (attemptNumberRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!attemptNumberRef.errors?.number">This field should be a number.</small>
+            </div>
+          }
+        </div>
+
+        @let attemptedAtRef = editForm.get('attemptedAt')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_attemptedAt">Attempted At</label>
+          <div class="d-flex">
+            <input
+              id="field_attemptedAt"
+              data-cy="attemptedAt"
+              type="datetime-local"
+              class="form-control"
+              name="attemptedAt"
+              formControlName="attemptedAt"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (attemptedAtRef.invalid && (attemptedAtRef.dirty || attemptedAtRef.touched)) {
+            <div>
+              @if (attemptedAtRef.errors?.required) {
+                <small class="form-text text-danger">This field is required.</small>
+              }
+              <small class="form-text text-danger" [hidden]="!attemptedAtRef.errors?.datetimelocal"
+                >This field should be a date and time.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_subscription">Subscription</label>
+          <select
+            class="form-select"
+            id="field_subscription"
+            data-cy="subscription"
+            name="subscription"
+            formControlName="subscription"
+            [compareWith]="compareWebhookSubscription"
+          >
+            @if (!editForm.get('subscription')!.value) {
+              <option [ngValue]="null" selected></option>
+            }
+            @for (webhookSubscriptionOption of webhookSubscriptionsSharedCollection(); track $index) {
+              <option [ngValue]="webhookSubscriptionOption">{{ webhookSubscriptionOption.id }}</option>
+            }
+          </select>
+        </div>
+        @if (
+          editForm.get(['subscription'])!.invalid && (editForm.get(['subscription'])!.dirty || editForm.get(['subscription'])!.touched)
+        ) {
+          <div>
+            @if (editForm.get(['subscription'])?.errors?.required) {
+              <small class="form-text text-danger">This field is required.</small>
+            }
+          </div>
+        }
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancel</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving()"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Save</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+                        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <!--
+        Added the entity Dispute.
+    -->
+    <changeSet id="20260921173156-1" author="jhipster">
+        <createTable tableName="dispute">
+            <column name="id" type="bigint">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="case_reference" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_dispute__case_reference" />
+            </column>
+            <column name="amount" type="decimal(21,2)">
+                <constraints nullable="false" />
+            </column>
+            <column name="currency_code" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="reason_code" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="reason_description" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
+            <column name="status" type="varchar(255)">
+                <constraints nullable="false" />
+            </column>
+            <column name="due_date" type="${datetimeType}">
+                <constraints nullable="false" />
+            </column>
+            <column name="evidence_submitted_at" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="resolved_at" type="${datetimeType}">
+                <constraints nullable="true" />
+            </column>
+            <column name="tenant_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <column name="transaction_id" type="bigint">
+                <constraints nullable="false" />
+            </column>
+            <!-- jhipster-needle-liquibase-add-column - JHipster will add columns here -->
+        </createTable>
+        <dropDefaultValue tableName="dispute" columnName="due_date" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="dispute" columnName="evidence_submitted_at" columnDataType="${datetimeType}"/>
+        <dropDefaultValue tableName="dispute" columnName="resolved_at" columnDataType="${datetimeType}"/>
+    </changeSet>
+
+    <!-- jhipster-needle-liquibase-add-changeset - JHipster will add changesets here -->
+</databaseChangeLog>

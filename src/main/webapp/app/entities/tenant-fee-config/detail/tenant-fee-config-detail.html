@@ -1,0 +1,68 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (tenantFeeConfig(); as tenantFeeConfigRef) {
+      <div>
+        <h2 data-cy="tenantFeeConfigDetailsHeading"><span>Tenant Fee Config</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ tenantFeeConfigRef.id }}</span>
+          </dd>
+          <dt><span>Fixed Fee</span></dt>
+          <dd>
+            <span>{{ tenantFeeConfigRef.fixedFee }}</span>
+          </dd>
+          <dt><span>Percentage Fee</span></dt>
+          <dd>
+            <span>{{ tenantFeeConfigRef.percentageFee }}</span>
+          </dd>
+          <dt><span>Cap Amount</span></dt>
+          <dd>
+            <span>{{ tenantFeeConfigRef.capAmount }}</span>
+          </dd>
+          <dt><span>Fee Bearer</span></dt>
+          <dd>
+            <span>{{ { null: '', MERCHANT: 'MERCHANT', CUSTOMER: 'CUSTOMER' }[tenantFeeConfigRef.feeBearer ?? 'null'] }}</span>
+          </dd>
+          <dt><span>Is Active</span></dt>
+          <dd>
+            <span>{{ tenantFeeConfigRef.isActive }}</span>
+          </dd>
+          <dt><span>Tenant</span></dt>
+          <dd>
+            @if (tenantFeeConfig()!.tenant) {
+              <div>
+                <a [routerLink]="['/corporate-tenant', tenantFeeConfig()!.tenant?.id, 'view']">{{ tenantFeeConfigRef.tenant?.id }}</a>
+              </div>
+            }
+          </dd>
+          <dt><span>Country Payment Method</span></dt>
+          <dd>
+            @if (tenantFeeConfig()!.countryPaymentMethod) {
+              <div>
+                <a [routerLink]="['/country-payment-method', tenantFeeConfig()!.countryPaymentMethod?.id, 'view']">{{
+                  tenantFeeConfigRef.countryPaymentMethod?.id
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/tenant-fee-config', tenantFeeConfigRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

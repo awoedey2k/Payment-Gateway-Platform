@@ -1,0 +1,98 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (transaction(); as transactionRef) {
+      <div>
+        <h2 data-cy="transactionDetailsHeading"><span>Transaction</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ transactionRef.id }}</span>
+          </dd>
+          <dt><span>Reference</span></dt>
+          <dd>
+            <span>{{ transactionRef.reference }}</span>
+          </dd>
+          <dt><span>Tenant Reference</span></dt>
+          <dd>
+            <span>{{ transactionRef.tenantReference }}</span>
+          </dd>
+          <dt><span>Status</span></dt>
+          <dd>
+            <span>{{
+              { null: '', PENDING: 'PENDING', AUTHORIZED: 'AUTHORIZED', SUCCESSFUL: 'SUCCESSFUL', FAILED: 'FAILED', REVERSED: 'REVERSED' }[
+                transactionRef.status ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span>Amount</span></dt>
+          <dd>
+            <span>{{ transactionRef.amount }}</span>
+          </dd>
+          <dt><span>Fee Amount</span></dt>
+          <dd>
+            <span>{{ transactionRef.feeAmount }}</span>
+          </dd>
+          <dt><span>Net Amount</span></dt>
+          <dd>
+            <span>{{ transactionRef.netAmount }}</span>
+          </dd>
+          <dt><span>Currency Code</span></dt>
+          <dd>
+            <span>{{ transactionRef.currencyCode }}</span>
+          </dd>
+          <dt><span>Country Code</span></dt>
+          <dd>
+            <span>{{ transactionRef.countryCode }}</span>
+          </dd>
+          <dt><span>Payment Method Code</span></dt>
+          <dd>
+            <span>{{ transactionRef.paymentMethodCode }}</span>
+          </dd>
+          <dt><span>Idempotency Key</span></dt>
+          <dd>
+            <span>{{ transactionRef.idempotencyKey }}</span>
+          </dd>
+          <dt><span>Customer Email</span></dt>
+          <dd>
+            <span>{{ transactionRef.customerEmail }}</span>
+          </dd>
+          <dt><span>Customer Phone</span></dt>
+          <dd>
+            <span>{{ transactionRef.customerPhone }}</span>
+          </dd>
+          <dt><span>Created At</span></dt>
+          <dd>
+            <span>{{ transactionRef.createdAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Completed At</span></dt>
+          <dd>
+            <span>{{ transactionRef.completedAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Tenant</span></dt>
+          <dd>
+            @if (transaction()!.tenant) {
+              <div>
+                <a [routerLink]="['/corporate-tenant', transaction()!.tenant?.id, 'view']">{{ transactionRef.tenant?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/transaction', transactionRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

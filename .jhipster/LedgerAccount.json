@@ -1,0 +1,31 @@
+{
+  "annotations": {
+    "changelogDate": "20260921173150"
+  },
+  "applications": ["paymentgateway"],
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "accountCode",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "accountType",
+      "fieldType": "LedgerAccountType",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ASSET,LIABILITY,REVENUE,EXPENSE"
+    },
+    {
+      "fieldName": "currencyCode",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "jpaMetamodelFiltering": true,
+  "name": "LedgerAccount",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

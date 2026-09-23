@@ -1,0 +1,64 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (auditLogEntry(); as auditLogEntryRef) {
+      <div>
+        <h2 data-cy="auditLogEntryDetailsHeading"><span>Audit Log Entry</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ auditLogEntryRef.id }}</span>
+          </dd>
+          <dt><span>Actor Type</span></dt>
+          <dd>
+            <span>{{
+              { null: '', SYSTEM: 'SYSTEM', STAFF_USER: 'STAFF_USER', TENANT_USER: 'TENANT_USER' }[auditLogEntryRef.actorType ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span>Actor Id</span></dt>
+          <dd>
+            <span>{{ auditLogEntryRef.actorId }}</span>
+          </dd>
+          <dt><span>Action</span></dt>
+          <dd>
+            <span>{{ auditLogEntryRef.action }}</span>
+          </dd>
+          <dt><span>Entity Type</span></dt>
+          <dd>
+            <span>{{ auditLogEntryRef.entityType }}</span>
+          </dd>
+          <dt><span>Entity Id</span></dt>
+          <dd>
+            <span>{{ auditLogEntryRef.entityId }}</span>
+          </dd>
+          <dt><span>Previous Hash</span></dt>
+          <dd>
+            <span>{{ auditLogEntryRef.previousHash }}</span>
+          </dd>
+          <dt><span>Entry Hash</span></dt>
+          <dd>
+            <span>{{ auditLogEntryRef.entryHash }}</span>
+          </dd>
+          <dt><span>Recorded At</span></dt>
+          <dd>
+            <span>{{ auditLogEntryRef.recordedAt | formatMediumDatetime }}</span>
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/audit-log-entry', auditLogEntryRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (refund(); as refundRef) {
+      <div>
+        <h2 data-cy="refundDetailsHeading"><span>Refund</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span>ID</span></dt>
+          <dd>
+            <span>{{ refundRef.id }}</span>
+          </dd>
+          <dt><span>Reference</span></dt>
+          <dd>
+            <span>{{ refundRef.reference }}</span>
+          </dd>
+          <dt><span>Amount</span></dt>
+          <dd>
+            <span>{{ refundRef.amount }}</span>
+          </dd>
+          <dt><span>Reason</span></dt>
+          <dd>
+            <span>{{
+              { null: '', CUSTOMER_REQUEST_RETURN: 'CUSTOMER_REQUEST_RETURN', FRAUD: 'FRAUD', DUPLICATE: 'DUPLICATE', OTHER: 'OTHER' }[
+                refundRef.reason ?? 'null'
+              ]
+            }}</span>
+          </dd>
+          <dt><span>Status</span></dt>
+          <dd>
+            <span>{{ { null: '', PENDING: 'PENDING', REFUNDED: 'REFUNDED', FAILED: 'FAILED' }[refundRef.status ?? 'null'] }}</span>
+          </dd>
+          <dt><span>Created At</span></dt>
+          <dd>
+            <span>{{ refundRef.createdAt | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span>Transaction</span></dt>
+          <dd>
+            @if (refund()!.transaction) {
+              <div>
+                <a [routerLink]="['/transaction', refund()!.transaction?.id, 'view']">{{ refundRef.transaction?.id }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="button" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left" />&nbsp;<span>Back</span>
+        </button>
+
+        <button type="button" [routerLink]="['/refund', refundRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt" />&nbsp;<span>Edit</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

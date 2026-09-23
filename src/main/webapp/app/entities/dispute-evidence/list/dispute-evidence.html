@@ -1,0 +1,176 @@
+<div>
+  <h2 id="page-heading" data-cy="DisputeEvidenceHeading">
+    <span>Dispute Evidences</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="load()" [disabled]="isLoading()">
+        <fa-icon icon="sync" [animation]="isLoading() ? 'spin' : undefined" />
+        <span>Refresh list</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-dispute-evidence"
+        [routerLink]="['/dispute-evidence/new']"
+      >
+        <fa-icon icon="plus" />
+        <span>Create a new Dispute Evidence</span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error />
+
+  <jhi-alert />
+
+  <jhi-filter [filters]="filters" />
+
+  @if (disputeEvidences().length === 0) {
+    <div class="alert alert-warning" id="no-result">
+      <span>No Dispute Evidences found</span>
+    </div>
+  } @else {
+    <div class="table-responsive table-entities" id="entities">
+      <table class="table table-striped" aria-describedby="page-heading">
+        <thead>
+          <tr jhiSort [(sortState)]="sortState" (sortChange)="navigateToWithComponentValues($event)">
+            <th scope="col" jhiSortBy="id">
+              <div class="d-flex">
+                <span>ID</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="evidenceType">
+              <div class="d-flex">
+                <span>Evidence Type</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fileName">
+              <div class="d-flex">
+                <span>File Name</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fileUrl">
+              <div class="d-flex">
+                <span>File Url</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="fileSizeBytes">
+              <div class="d-flex">
+                <span>File Size Bytes</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="mimeType">
+              <div class="d-flex">
+                <span>Mime Type</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="sha256Checksum">
+              <div class="d-flex">
+                <span>Sha 256 Checksum</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="uploadedAt">
+              <div class="d-flex">
+                <span>Uploaded At</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col" jhiSortBy="dispute.id">
+              <div class="d-flex">
+                <span>Dispute</span>
+                <fa-icon class="p-1" icon="sort" />
+              </div>
+            </th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (disputeEvidence of disputeEvidences(); track trackId(disputeEvidence)) {
+            <tr data-cy="entityTable">
+              <td>
+                <a [routerLink]="['/dispute-evidence', disputeEvidence.id, 'view']">{{ disputeEvidence.id }}</a>
+              </td>
+              <td>
+                {{
+                  {
+                    null: '',
+                    PROOF_OF_DELIVERY: 'PROOF_OF_DELIVERY',
+                    CUSTOMER_COMMUNICATION: 'CUSTOMER_COMMUNICATION',
+                    REFUND_POLICY: 'REFUND_POLICY',
+                    OTHER: 'OTHER',
+                  }[disputeEvidence.evidenceType ?? 'null']
+                }}
+              </td>
+              <td>{{ disputeEvidence.fileName }}</td>
+              <td>{{ disputeEvidence.fileUrl }}</td>
+              <td>{{ disputeEvidence.fileSizeBytes }}</td>
+              <td>{{ disputeEvidence.mimeType }}</td>
+              <td>{{ disputeEvidence.sha256Checksum }}</td>
+              <td>{{ disputeEvidence.uploadedAt | formatMediumDatetime }}</td>
+              <td>
+                @if (disputeEvidence.dispute) {
+                  <div>
+                    <a [routerLink]="['/dispute', disputeEvidence.dispute.id, 'view']">{{ disputeEvidence.dispute.id }}</a>
+                  </div>
+                }
+              </td>
+              <td class="text-end">
+                <div class="btn-group">
+                  <a
+                    [routerLink]="['/dispute-evidence', disputeEvidence.id, 'view']"
+                    class="btn btn-info btn-sm"
+                    data-cy="entityDetailsButton"
+                  >
+                    <fa-icon icon="eye" />
+                    <span class="d-none d-md-inline">View</span>
+                  </a>
+
+                  <a
+                    [routerLink]="['/dispute-evidence', disputeEvidence.id, 'edit']"
+                    class="btn btn-primary btn-sm"
+                    data-cy="entityEditButton"
+                  >
+                    <fa-icon icon="pencil-alt" />
+                    <span class="d-none d-md-inline">Edit</span>
+                  </a>
+
+                  <button type="button" (click)="delete(disputeEvidence)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                    <fa-icon icon="times" />
+                    <span class="d-none d-md-inline">Delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+  @if (disputeEvidences().length > 0) {
+    <div>
+      <div class="d-flex justify-content-center">
+        <jhi-item-count [params]="{ page: page(), totalItems: totalItems(), itemsPerPage: itemsPerPage() }" />
+      </div>
+
+      <div class="d-flex justify-content-center">
+        <ngb-pagination
+          [collectionSize]="totalItems()"
+          [page]="page()"
+          [pageSize]="itemsPerPage()"
+          [maxSize]="5"
+          [rotate]="true"
+          [boundaryLinks]="true"
+          (pageChange)="navigateToPage($event)"
+        />
+      </div>
+    </div>
+  }
+</div>
